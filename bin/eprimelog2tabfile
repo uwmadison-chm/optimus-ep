@@ -1,0 +1,139 @@
+#!/usr/bin/env ruby
+
+# Part of the Optimus package for managing E-Prime data
+# 
+# Copyright (C) 2008 Board of Regents of the University of Wisconsin System
+# 
+# Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
+# Imaging and Behavior, University of Wisconsin - Madison
+
+require 'rubygems'
+require 'optparse'
+gem 'optimus'
+require 'eprime'
+
+module Eprime
+  class LogToTabConverter
+    attr_reader :options
+    attr_accessor :data_out
+    
+    def initialize(args, data_out = STDOUT, console_out = STDOUT, err = STDERR)
+      @args = args
+      @data_out = data_out
+      @console_out = console_out
+      @err = err
+      
+      @options = Hash.new
+      @parser = option_parser(@options, @args)
+      @columns = read_columns # nil is OK here
+      
+    end
+    
+    def show_help?
+      @args.length == 0 or @options[:help]
+    end
+    
+    def print_usage
+      @console_out.puts @parser.to_s
+    end
+    
+    def convert
+      eprime = nil
+      File.open(@options[:infile], 'r') do |f|
+        reader = Eprime::Reader::LogFileParser.new(f, {:columns => @columns, :force => @options[:force]})
+        eprime = reader.to_eprime
+      end
+      writer = Eprime::TabfileWriter.new(eprime, data_out, {:write_top_line => @options[:add_filename_line]})
+      writer.write
+    end
+    
+    private
+    
+    def read_columns
+      # Columns should be separated by tabs
+      cols = nil
+      if @options[:column_file]
+        File.open(@options[:column_file], 'r') do |f|
+          cols = f.readline.strip.split("\t")
+        end
+      end
+      return cols
+    end
+    
+    def option_parser(option_hash, args)
+      opts = OptionParser.new
+
+      opts.banner = "Usage: eprimelog2tabfile [options] INPUT_FILE"
+      opts.separator ""
+
+      opts.on('-o', '--outfile=OUTFILE', String,
+        'The name of the file to create. If this',
+        'isn\'t specified, print to the standard',
+        "output."
+      ) { |val|
+        option_hash[:outfile] = val
+      }
+      opts.separator ""
+  
+      opts.on('-c', '--columns=COLUMN_FILE', String, 
+        'A tab-separated file containing the columns',
+        "in the order you want your output."
+      ) { |val|
+        option_hash[:column_file] = val
+      }
+      opts.separator ""
+
+      opts.on('-a', '--add-filename-line', TrueClass,
+        'Print the filename as the first line of',
+        "your output, just like E-DataAid."
+      ) { 
+        option_hash[:add_filename_line] = true
+      }
+      opts.separator ""
+
+      opts.on('-f', '--force', TrueClass,
+        "Continue processing even there are errors."
+      ) {
+        option_hash[:force] = true
+      }
+      opts.separator ""
+
+      opts.on('-h', '--help', TrueClass,
+        'Print this message'
+      ) {
+        option_hash[:help] = true
+      }
+
+      option_hash[:extras] = opts.parse(*args)
+      option_hash[:help] = true if args.length == 0
+        
+      option_hash[:infile] = option_hash[:extras][0] # Make this easy to find
+      unless option_hash[:help] or option_hash[:infile]
+        raise Exception.new('no input file specified')
+      end
+      return opts
+    end
+  end
+end
+
+begin
+  conv = Eprime::LogToTabConverter.new(ARGV)
+rescue Exception => e
+  STDERR.puts e.message+"\nrun eprimelog2tabfile --help for options\n"
+  exit(1)
+end
+
+if conv.show_help?
+  conv.print_usage
+  exit(0)
+end
+
+outstream = STDOUT
+
+if conv.options[:outfile]
+  outstream = File.open(conv.options[:outfile], 'w')
+  conv.data_out = outstream
+end
+
+conv.convert
+

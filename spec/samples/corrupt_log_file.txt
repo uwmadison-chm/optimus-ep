@@ -1,0 +1,116 @@
+*** Header Start ***
+VersionPersist: 1
+LevelName: Session
+LevelName: Block
+LevelName: Trial
+LevelName: SubTrial
+LevelName: LogLevel5
+LevelName: LogLevel6
+LevelName: LogLevel7
+LevelName: LogLevel8
+LevelName: LogLevel9
+LevelName: LogLevel10
+Experiment: test_gng_v1
+SessionDate: 11-11-2006
+SessionTime: 15:11:37
+RandomSeed: -1148015259
+Group: 1
+Subject: 043
+Session: 043
+Display.RefreshRate: 60.365
+*** Header End ***
+	Level: 2
+	*** LogFrame Start ***
+	BlockList: 1
+	NoGoTypeA: Fear
+	NoGoTypeB: 2
+	blocknumb: 1
+	shapeface: faces of all expressions
+	Procedure: RunTrial
+	BlockList.Cycle: 1
+	BlockList.Sample: 1
+	Running: BlockList
+	StartTime: 5000
+	FixTime: 20000
+	InstTime: 5000
+	StartR.OnsetTime: 64697
+	StartR.OffsetTime: 68683
+	FixatRun.OnsetTime: 68739
+	FixatRun.OffsetTime: 88583
+	NoGoInstruct.OnsetTime: 88684
+	NoGoInstruct.OffsetTime: 93583
+	InitITI.OnsetTime: 93687
+	InitITI.OffsetTime: 96083
+	*** LogFrame End ***
+	Level: 2
+	*** LogFrame Start ***
+	BlockList: 2
+	NoGoTypeA: Fear
+	NoGoTypeB: 2
+	blocknumb: 1
+	shapeface: 
+	Procedure: StimProc
+	StimList1: 1
+	StimTypeA: Anger
+	StimTypeB: 2
+	gonogo: Fear2
+	ITI_Run: 3300
+	Code: 14
+	BlockList.Cycle: 1
+	BlockList.Sample: 2
+	Running: BlockList
+	StimTime: 500
+	StimPresent.OnsetDelay: 6
+	StimPresent.OnsetTime: 96189
+	StimPresent.DurationError: -6
+	StimPresent.OffsetTime: 96583
+	StimPresent.RTTime: 0
+	StimPresent.ACC: 1
+	StimPresent.RT: 0
+	StimPresent.RESP: 
+	StimPresent.CRESP: 
+	ITIFixat.OnsetTime: 96686
+	ITIFixat.OffsetTime: 99883
+	TrialType: Go
+	*** LogFrame End ***
+	Level: 2
+	*** LogFrame Start ***
+	BlockList: 2
+	NoGoTypeA: Fear
+	NoGoTypeB: 2
+	blocknumb: 1
+	shapeface: 
+	Procedure: StimProc
+	StimList1: 2
+	StimTypeA: Fear
+	StimTypeB: 2
+	gonogo: Fear2
+	ITI_Run: 2600
+	Code: 15
+	BlockList.Cycle: 1
+	BlockList.Sample: 3
+	Running: BlockList
+	StimTime: 500
+	StimPresent.OnsetDelay: -1
+	StimPresent.OnsetTime: 99982
+	StimPresent.DurationError: 1
+	StimPresent.OffsetTime: 100383
+	StimPresent.RTTime: 0
+	StimPresent.ACC: 1
+	StimPresent.RT: 0
+	StimPresent.RESP: 
+	StimPresent.CRESP: 
+	ITIFixat.OnsetTime: 100496
+	ITIFixat.OffsetTime: 102983
+	TrialType: NoGo
+	*** LogFrame End ***
+Level: 1
+*** LogFrame Start ***
+Experiment: test_gng_v1
+SessionDate: 11-11-2006
+SessionTime: 15:11:37
+RandomSeed: -1148015259
+Group: 1
+Subject: 043
+Session: 043
+Display.RefreshRate: 60.365
