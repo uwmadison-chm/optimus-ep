@@ -15,14 +15,14 @@ module Eprime
     attr_reader :type
     
     TYPES = {:log => 1, :excel => 1, :eprime => 1}
-    def initialize(filename = nil)
-      load_file(filename) if filename
+    def initialize(instream = nil)
+      read_input(instream) if instream
     end
     
-    def load_file(filename)
+    def read_input(instream)
       begin
-        @file = File.open(filename, 'r')
-        set_type(@file)
+        @instream = instream
+        set_type(@instream)
       rescue Exception => e
         raise UnknownTypeError.new(e.message)
       end
