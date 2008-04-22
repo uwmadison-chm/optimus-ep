@@ -23,6 +23,7 @@ module Eprime
       @eprime = eprime_data
       @outstream = outstream
       @write_top_line = options[:write_top_line]
+      @columns = options[:columns] || @eprime.columns
     end
     
     # Write to the output stream.
@@ -32,9 +33,10 @@ module Eprime
           name = @outstream.respond_to?(:path) ? File.expand_path(@outstream.path.to_s) : ''
           tsv << [name]
         end
-        tsv << @eprime.columns
+        tsv << @columns
         @eprime.each do |row|
-          tsv << row.values
+          vals = @columns.map { |col_name| row[col_name] }
+          tsv << vals
         end
       end
     end

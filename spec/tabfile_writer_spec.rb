@@ -65,4 +65,19 @@ describe "Eprime::TabfileWriter" do
     end
     
   end
+  
+  describe "with good output columns specified" do
+    before :each do
+      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s, :columns => ['col_2'])
+      @writer.write
+      @out_s.rewind
+    end
+    
+    it "should include only one column" do
+      lines = @out_s.readlines
+      lines[0].split("\t").size.should == 1
+      lines[1].split("\t").size.should == 1
+      lines[1].split("\t")[0].strip.should == "c_2_r_1"
+    end
+  end
 end
