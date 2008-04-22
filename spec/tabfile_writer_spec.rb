@@ -80,4 +80,12 @@ describe "Eprime::TabfileWriter" do
       lines[1].split("\t")[0].strip.should == "c_2_r_1"
     end
   end
+  
+  describe "with nonexistent output column specified" do
+
+    it "should raise an error when specifying a nonexistent column" do
+      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s, :columns => ['KITTEH'])
+      lambda { @writer.write }.should raise_error(IndexError)
+    end
+  end
 end
