@@ -6,13 +6,19 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 
-# This class is not yet ready for prime-time -- it needs specs and such before it can really
-# be considered done. There's also no error checking. It's horrid at the moment.
-#
-# You have been warned.
-
 module Eprime
   class Reader
+    
+    # This class is for reading tab-delimited Eprime files. (Or, really, any tab-delimited file).
+    # The main option of interest is the :skip_lines option, which specifies how many lines
+    # to skip before finding column names. For example:
+    #
+    # TabfileParser.new(stream, :skip_lines => 1)
+    #
+    # is what you'd use for skipping the filename line in a standard eprime Excel file.
+    #
+    # Note: you'll generally be using subclasses of this, and not manually specifying skip_lines.
+    
     class TabfileParser
       def initialize(file, options = {})
         @file = file
