@@ -43,7 +43,10 @@ module Eprime
         reader = Eprime::Reader::LogFileParser.new(f, {:columns => @columns, :force => @options[:force]})
         eprime = reader.to_eprime
       end
-      writer = Eprime::TabfileWriter.new(eprime, data_out, {:write_top_line => @options[:add_filename_line]})
+      writer = Eprime::TabfileWriter.new(eprime, data_out, {
+        :write_top_line => @options[:add_filename_line],
+        :columns => @columns
+        })
       begin
         writer.write
       rescue Errno::EPIPE => e
@@ -86,6 +89,15 @@ module Eprime
         option_hash[:column_file] = val
       }
       opts.separator ""
+      
+      opts.on('--filter-columns', TrueClass,
+        'Write out only the columns in COLUMN_FILE.',
+        'Requires the use of --columns'
+      ) {
+        option_hash[:filter_columns] = true
+        option_hash[:force] = true
+      }
+      opts.separator ""
 
       opts.on('-a', '--add-filename-line', TrueClass,
         'Print the filename as the first line of',
@@ -112,6 +124,9 @@ module Eprime
       option_hash[:help] = true if args.length == 0
         
       option_hash[:infile] = option_hash[:extras][0] # Make this easy to find
+      if option_hash[:filter_columns] and not option_hash[:column_file]
+        raise Exception.new('--columns must be specified when using --filter-columns')
+      end
       unless option_hash[:help] or option_hash[:infile]
         raise Exception.new('no input file specified')
       end
