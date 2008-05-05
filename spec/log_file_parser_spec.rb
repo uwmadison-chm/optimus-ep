@@ -9,13 +9,7 @@ require File.join(File.dirname(__FILE__),'spec_helper')
 require File.join(File.dirname(__FILE__), '../lib/eprime')
 include EprimeTestHelper
 
-LOG_COLUMNS = ["ExperimentName", "Subject", "Session", "RFP.StartTime", "BlockTitle", "PeriodA", "CarriedVal[Session]", "BlockList", "Trial", 
-"NameOfPeriodList", "NumPeriods", "PeriodB", "Procedure[Block]", "Block", "Group", 
-"CarriedVal[Block]", "BlockList.Sample", "SessionTime", "Clock.Scale", "BlockList.Cycle", 
-"Stim1.OnsetTime", "CarriedVal[Trial]", "Display.RefreshRate", "Running[Block]", 
-"StartDelay", "CarriedVal", "Stim1.OffsetTime", "Running[Trial]", "ScanStartTime", 
-"Periods", "TypeA", "BlockElapsed", "RFP.LastPulseTime", "BlockTime", "Procedure[Trial]", 
-"SessionDate", "TypeB", "Procedure", "StartTime", "RandomSeed", "Running"]
+
 
 describe Eprime::Reader::LogFileParser do
   describe "parsing a good file" do
@@ -123,7 +117,7 @@ describe Eprime::Reader::LogFileParser do
   describe "with sorted columns" do
     before :each do
       @file = File.open(LOG_FILE, 'r')
-      @reader = Eprime::Reader::LogFileParser.new(@file, :columns => LOG_COLUMNS)
+      @reader = Eprime::Reader::LogFileParser.new(@file, :columns => STD_COLUMNS)
       @reader.make_frames!
       @eprime = @reader.to_eprime
     end

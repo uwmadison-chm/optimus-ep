@@ -14,9 +14,9 @@
 module Eprime
   class Reader
     class TabfileParser
-      def initialize(file, skip_lines=1)
+      def initialize(file, options = {})
         @file = file
-        @skip_lines = skip_lines
+        @skip_lines = options[:skip_lines] || 0
       end
       
       def to_eprime
@@ -26,11 +26,16 @@ module Eprime
         end
         
         columns = lines.shift.split("\t").map {|elt| elt.strip }
-        
+        expected_size = columns.size
         data = Eprime::Data.new(columns)
+        current_line = @skip_lines+1
         lines.each do |line|
+          current_line += 1
           row = data.add_row
           col_data = line.split("\t").map {|e| e.strip }
+          if col_data.size != expected_size
+            raise DamagedFileError.new("In #{@file.path}, line #{current_line} should have #{expected_size} columns but had #{col_data.size}.")
+          end
           col_data.each_index do |i|
             row[i] = col_data[i]
           end

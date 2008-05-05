@@ -10,10 +10,20 @@ module EprimeTestHelper
     SAMPLE_DIR = File.join(File.dirname(__FILE__), 'samples')
     LOG_FILE = File.join(SAMPLE_DIR, 'optimus_log.txt')
     EXCEL_FILE = File.join(SAMPLE_DIR, 'excel_tsv.txt')
+    BAD_EXCEL_FILE = File.join(SAMPLE_DIR, 'bad_excel_tsv.txt')
     EPRIME_FILE = File.join(SAMPLE_DIR, 'eprime_tsv.txt')
     UNKNOWN_FILE = File.join(SAMPLE_DIR, 'unknown_type.txt')
     UNREADABLE_FILE = File.join(SAMPLE_DIR, 'unreadable_file')
     CORRUPT_LOG_FILE = File.join(SAMPLE_DIR, 'corrupt_log_file.txt')
+    
+    
+    STD_COLUMNS = ["ExperimentName", "Subject", "Session", "RFP.StartTime", "BlockTitle", "PeriodA", "CarriedVal[Session]", "BlockList", "Trial", 
+    "NameOfPeriodList", "NumPeriods", "PeriodB", "Procedure[Block]", "Block", "Group", 
+    "CarriedVal[Block]", "BlockList.Sample", "SessionTime", "Clock.Scale", "BlockList.Cycle", 
+    "Stim1.OnsetTime", "CarriedVal[Trial]", "Display.RefreshRate", "Running[Block]", 
+    "StartDelay", "CarriedVal", "Stim1.OffsetTime", "Running[Trial]", "ScanStartTime", 
+    "Periods", "TypeA", "BlockElapsed", "RFP.LastPulseTime", "BlockTime", "Procedure[Trial]", 
+    "SessionDate", "TypeB", "Procedure", "StartTime", "RandomSeed", "Running"]
   end
   
   
