@@ -44,7 +44,11 @@ module Eprime
         eprime = reader.to_eprime
       end
       writer = Eprime::TabfileWriter.new(eprime, data_out, {:write_top_line => @options[:add_filename_line]})
-      writer.write
+      begin
+        writer.write
+      rescue Errno::EPIPE => e
+        # A broken pipe in stdout is just fine.
+      end
     end
     
     private
