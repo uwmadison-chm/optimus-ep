@@ -38,10 +38,12 @@ module Eprime
     end
     
     def convert
-      eprime = nil
-      File.open(@options[:infile], 'r') do |f|
-        reader = Eprime::Reader::LogFileParser.new(f, {:columns => @columns, :force => @options[:force]})
-        eprime = reader.to_eprime
+      eprime = Eprime::Data.new(@columns || [])
+      @options[:files].each do |filename|
+        File.open(filename, 'r') do |f|
+          reader = Eprime::Reader::LogFileParser.new(f, {:columns => @columns, :force => @options[:force]})
+          eprime.merge!(reader.to_eprime)
+        end
       end
       writer = Eprime::TabfileWriter.new(eprime, data_out, {
         :write_top_line => @options[:add_filename_line],
@@ -70,7 +72,7 @@ module Eprime
     def option_parser(option_hash, args)
       opts = OptionParser.new
 
-      opts.banner = "Usage: eprimelog2tabfile [options] INPUT_FILE"
+      opts.banner = "Usage: eprimelog2tabfile [options] INPUT_FILES"
       opts.separator ""
 
       opts.on('-o', '--outfile=OUTFILE', String,
@@ -120,15 +122,15 @@ module Eprime
         option_hash[:help] = true
       }
 
-      option_hash[:extras] = opts.parse(*args)
+      option_hash[:files] = opts.parse(*args)
+      puts option_hash[:files]
       option_hash[:help] = true if args.length == 0
-        
-      option_hash[:infile] = option_hash[:extras][0] # Make this easy to find
+      
       if option_hash[:filter_columns] and not option_hash[:column_file]
         raise Exception.new('--columns must be specified when using --filter-columns')
       end
-      unless option_hash[:help] or option_hash[:infile]
-        raise Exception.new('no input file specified')
+      unless option_hash[:help] or option_hash[:files][0]
+        raise Exception.new('no input files specified')
       end
       return opts
     end

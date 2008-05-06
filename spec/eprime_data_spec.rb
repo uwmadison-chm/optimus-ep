@@ -86,13 +86,36 @@ describe Eprime::Data do
   describe "without initial columns" do
     before :each do
       @data = Eprime::Data.new
+      @d2 = mock_eprime(2,3)
+      @d3 = mock_eprime(2,4)
     end
-  
+    
+    it "should have return an Eprime::Data object on merge" do
+      @data.merge(@d2).should be_an_instance_of(Eprime::Data)
+    end
+
     describe "(empty)" do
       it_should_behave_like "empty Eprime::Data"
   
       it "should have no columns at creation" do
         @data.columns.length.should == 0
+      end
+
+      it "should add rows on merge" do
+        d = @data.merge(@d2)
+        d.size.should == (@data.size + @d2.size)
+      end
+      
+      it "should add rows to the original object on merge!" do
+        lambda {
+          @data.merge!(@d2, @d3)
+        }.should change(@data, :size).by(@d2.size + @d3.size)
+      end
+      
+      it "should not change the original object's size on merge" do
+        lambda {
+          @data.merge(@d2, @d3)
+        }.should_not change(@data, :size)
       end
     end
   
@@ -100,7 +123,12 @@ describe Eprime::Data do
       before :each do
         @row = @data.add_row
       end
-      
+
+      it "should should add rows on merge" do
+        d = @data.merge(@d2, @d3)
+        d.size.should == (@data.size + @d2.size + @d3.size)
+      end
+  
       it_should_behave_like "Eprime::Data with one row"
   
       it "should add a column when setting a value in row" do
@@ -155,5 +183,4 @@ describe "Eprime::Data with initial columns" do
       }.should raise_error(Eprime::ColumnAddedWarning)
     end
   end
-  
 end

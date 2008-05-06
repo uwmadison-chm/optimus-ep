@@ -58,6 +58,26 @@ module Eprime
       end
     end
     
+    # Returns a new Eprime::Data object containing the data from this
+    # and all other data sets
+    def merge(*datasets)
+      d = Eprime::Data.new
+      return d.merge!(self, *datasets)
+    end
+    
+    # Combine more Eprime::Data objects into this one, in-place
+    def merge!(*datasets)
+      datasets.each do |source|
+        source.each do |row|
+          r = self.add_row
+          source.columns.each do |col|
+            r[col] = row[col]
+          end
+        end
+      end
+      return self
+    end
+    
     # We mostly delegate to our rows array
     def method_missing(method, *args, &block)
       @rows.send method, *args, &block
