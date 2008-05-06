@@ -123,7 +123,6 @@ module Eprime
       }
 
       option_hash[:files] = opts.parse(*args)
-      puts option_hash[:files]
       option_hash[:help] = true if args.length == 0
       
       if option_hash[:filter_columns] and not option_hash[:column_file]
