@@ -45,7 +45,8 @@ module Eprime
     
     attr_reader :columns
     
-    def initialize(columns = [])
+    def initialize(columns = [], options = {})
+      @options = options || []
       @rows = []
       @columns = []
       @column_hash = {}
@@ -104,7 +105,7 @@ module Eprime
       @columns << col_id
       index = @columns.length - 1
       @column_hash[col_id] = index
-      if @columns_set_in_initialize
+      if @columns_set_in_initialize and not @options[:ignore_warnings]
         raise ColumnAddedWarning.new("Warning: Added column #{col_id} after specifying columns at init", index)
       end
       return index

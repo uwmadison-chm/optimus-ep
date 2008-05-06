@@ -38,7 +38,7 @@ module Eprime
     end
     
     def convert
-      eprime = Eprime::Data.new(@columns || [])
+      eprime = Eprime::Data.new(@columns, :ignore_warnings => @options[:force])
       @options[:files].each do |filename|
         File.open(filename, 'r') do |f|
           reader = Eprime::Reader::LogFileParser.new(f, {:columns => @columns, :force => @options[:force]})

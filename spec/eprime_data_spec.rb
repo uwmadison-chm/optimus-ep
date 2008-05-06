@@ -157,30 +157,52 @@ describe Eprime::Data do
 end
 
 describe "Eprime::Data with initial columns" do
-  before :each do
-    @data = Eprime::Data.new(INITIAL_COLUMNS)
-  end
-  
-  describe "(empty)" do
-    it_should_behave_like "empty Eprime::Data"
-    
-    it "should have the same number of columns as INITIAL_COLUMNS" do
-      @data.columns.length.should == INITIAL_COLUMNS.length
-    end
-    
-  end
-  
-  describe "(with one row)" do
-    it_should_behave_like "Eprime::Data with one row"
-    
+  describe "without setting ignore" do
     before :each do
-      @row = @data.add_row
+      @data = Eprime::Data.new(INITIAL_COLUMNS)
+    end
+  
+    describe "(empty)" do
+      it_should_behave_like "empty Eprime::Data"
+    
+      it "should have the same number of columns as INITIAL_COLUMNS" do
+        @data.columns.length.should == INITIAL_COLUMNS.length
+      end
+    
+    end
+  
+    describe "(with one row)" do
+      it_should_behave_like "Eprime::Data with one row"
+    
+      before :each do
+        @row = @data.add_row
+      end
+    
+      it "should raise a warning when adding a new column" do
+        lambda {
+          @row[NEW_COL_1] = "kitteh"
+        }.should raise_error(Eprime::ColumnAddedWarning)
+      end
+    
+    end
+  end
+  
+  describe "with ignore set" do
+    before :each do
+      @data = Eprime::Data.new(INITIAL_COLUMNS, :ignore_warnings => true)
     end
     
-    it "should raise a warning when adding a new column" do
+    it "should not raise a warning when adding a new column" do
+      row = @data.add_row
       lambda {
-        @row[NEW_COL_1] = "kitteh"
-      }.should raise_error(Eprime::ColumnAddedWarning)
+        row[NEW_COL_1] = "kitteh"
+      }.should_not raise_error
+    end
+    
+    it "should add new columns" do
+      row = @data.add_row
+      row[NEW_COL_1] = "kitteh"
+      row[NEW_COL_1].should == "kitteh"
     end
   end
 end
