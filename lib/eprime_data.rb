@@ -51,7 +51,7 @@ module Eprime
       @columns = []
       @column_hash = {}
       @columns_set_in_initialize = false
-      if (columns.length > 0)
+      if (columns && columns.length > 0)
         columns.each do |col|
           idx = self.find_or_add_column_index(col)
         end
