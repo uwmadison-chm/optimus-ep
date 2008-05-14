@@ -11,7 +11,7 @@ module Eprime
     # Reads and parses E-Prime log files (the ones that start with 
     # *** Header Start ***) and transforms them into an Eprime::Data structure
     
-    class LogFileParser
+    class LogfileParser
       # Handles parsing eprime log files, which are essentially a blow-by-blow
       # log of everything that happened during an eprime run.
 
@@ -203,6 +203,6 @@ module Eprime
           @data.send meth, *args
         end
       end
-    end # Class LogFileParser
+    end # Class LogfileParser
   end # Class Reader
 end # Module Eprime

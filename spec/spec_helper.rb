@@ -21,9 +21,13 @@ module EprimeTestHelper
     "NameOfPeriodList", "NumPeriods", "PeriodB", "Procedure[Block]", "Block", "Group", 
     "CarriedVal[Block]", "BlockList.Sample", "SessionTime", "Clock.Scale", "BlockList.Cycle", 
     "Stim1.OnsetTime", "CarriedVal[Trial]", "Display.RefreshRate", "Running[Block]", 
-    "StartDelay", "CarriedVal", "Stim1.OffsetTime", "Running[Trial]", "ScanStartTime", 
+    "StartDelay", "Stim1.OffsetTime", "Running[Trial]", "ScanStartTime", 
     "Periods", "TypeA", "BlockElapsed", "RFP.LastPulseTime", "BlockTime", "Procedure[Trial]", 
-    "SessionDate", "TypeB", "Procedure", "StartTime", "RandomSeed", "Running"]
+    "SessionDate", "TypeB", "StartTime", "RandomSeed"]
+    
+    SORTED_COLUMNS = STD_COLUMNS.sort
+    
+    SHORT_COLUMNS = ["ExperimentName", "Subject"]
   end
   
   

@@ -11,11 +11,11 @@ include EprimeTestHelper
 
 
 
-describe Eprime::Reader::LogFileParser do
+describe Eprime::Reader::LogfileParser do
   describe "parsing a good file" do
     before :each do
       @file = File.open(LOG_FILE, 'r')
-      @reader = Eprime::Reader::LogFileParser.new(@file)
+      @reader = Eprime::Reader::LogfileParser.new(@file)
       @reader.make_frames!
     end
   
@@ -117,7 +117,7 @@ describe Eprime::Reader::LogFileParser do
   describe "with sorted columns" do
     before :each do
       @file = File.open(LOG_FILE, 'r')
-      @reader = Eprime::Reader::LogFileParser.new(@file, :columns => STD_COLUMNS)
+      @reader = Eprime::Reader::LogfileParser.new(@file, :columns => STD_COLUMNS)
       @reader.make_frames!
       @eprime = @reader.to_eprime
     end
@@ -140,7 +140,7 @@ describe Eprime::Reader::LogFileParser do
   describe "parsing bad files" do
     before :each do
       @file = File.open(CORRUPT_LOG_FILE, 'r')
-      @reader = Eprime::Reader::LogFileParser.new(@file)
+      @reader = Eprime::Reader::LogfileParser.new(@file)
     end
     after :each do
       @file.close

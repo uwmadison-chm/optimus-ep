@@ -12,39 +12,69 @@ module Eprime
   # This class isn't yet used anywhere.
   class Reader
     
-    attr_reader :type
+    attr_reader :type, :parser, :input
+    attr_accessor :options
     
-    TYPES = {:log => 1, :excel => 1, :eprime => 1}
-    def initialize(instream = nil)
-      read_input(instream) if instream
+    TYPES = {:log => LogfileParser, :excel => ExcelParser, :eprime => EprimetabParser}
+    def initialize(input = nil, options = {})
+      @options = options || {}
+      set_input(input) unless input.nil?
     end
     
-    def read_input(instream)
+    def input=(input)
+      set_input(input)
+    end
+    
+    def eprime_data
+      @eprime_data ||= @parser.to_eprime
+      return @eprime_data
+    end
+    
+    def options=(options)
+      @options = options || {}
+      set_parser!
+    end
+    
+    private
+    def set_input(input)
+      @input = input
+      read_input!
+    end
+    
+    # Reads the input, sets @type and @parser.
+    def read_input!
       begin
-        @instream = instream
-        set_type(@instream)
+        set_type(@input)
       rescue Exception => e
         raise UnknownTypeError.new(e.message)
       end
     end
     
-    private
+    
     # Sets @type to one of Eprime::Reader::TYPES or raises an Eprime::UnknownTypeError
     # Does not change file position.
     def set_type(file)
-      original_pos = file.pos
-      file.rewind
+      @file = file
+      original_pos = @file.pos
+      @file.rewind
       first_lines = Array.new
       # We can tell what kind of file this is from the first two lines
       # If there aren't two lines, this can't be a good file.
       2.times do
-        first_lines << file.gets
+        first_lines << @file.gets
       end
-      file.pos = original_pos
+      @file.pos = original_pos
       @type = determine_file_type(first_lines)
       if @type.nil?
         raise UnknownTypeError.new("Can't determine the type of #{file.path}")
       end
+      set_parser!
+    end
+    
+    def set_parser!
+      @eprime_data = nil
+      return unless @type && TYPES[@type]
+      @parser = TYPES[@type].new(@file, @options)
     end
     
     # Determines the type of an eprime file, based on its first two lines.

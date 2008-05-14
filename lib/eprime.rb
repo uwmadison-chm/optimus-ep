@@ -6,12 +6,13 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 # Require the entire package
-require File.dirname(__FILE__)+'/eprime_reader'
 require File.dirname(__FILE__)+'/log_file_parser'
 require File.dirname(__FILE__)+'/eprime_data'
 require File.dirname(__FILE__)+'/tabfile_parser'
 require File.dirname(__FILE__)+'/tabfile_writer'
 require File.dirname(__FILE__)+'/excel_parser'
+require File.dirname(__FILE__)+'/eprimetab_parser'
+require File.dirname(__FILE__)+'/eprime_reader'
 
 module Eprime
 

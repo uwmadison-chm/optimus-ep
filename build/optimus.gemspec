@@ -9,13 +9,13 @@ require 'rubygems'
 
 Gem::Specification.new do |s|
   s.name = 'optimus'
-  s.version = '0.2'
+  s.version = '0.3'
   s.platform = Gem::Platform::RUBY
   s.author = "Nathan Vack"
   s.email = "njvack@wisc.edu"
   s.summary = "A collection of utilities to manage EPrime files"
   s.homepage = "http://code.google.com/p/optimus-ep/"
-  s.executables = ["eprimelog2tabfile"]
+  s.executables = ["eprime2tabfile"]
 
   s.files = %w(Rakefile) +
   Dir.glob("{misc,bin,spec,examples}/**/*") +

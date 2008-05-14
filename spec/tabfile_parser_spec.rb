@@ -39,15 +39,11 @@ describe Eprime::Reader::TabfileParser do
   describe "with column order specified" do
     before :each do
       @file = File.open(EXCEL_FILE, 'r')
-      @reader = Eprime::Reader::TabfileParser.new(@file, :skip_lines => 1, :columns => STD_COLUMNS)
+      @reader = Eprime::Reader::TabfileParser.new(@file, :skip_lines => 1, :columns => SORTED_COLUMNS)
       @eprime = @reader.to_eprime
     end
    
     it_should_behave_like "Eprime::Reader::TabfileParser with sample data"
-    
-    it "should have the specified column order" do
-      @eprime.columns.should == STD_COLUMNS
-    end
     
   end
   

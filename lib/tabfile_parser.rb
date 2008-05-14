@@ -23,6 +23,7 @@ module Eprime
       def initialize(file, options = {})
         @file = file
         @skip_lines = options[:skip_lines] || 0
+        @columns = options[:columns]
       end
       
       def to_eprime
@@ -31,8 +32,9 @@ module Eprime
           lines.shift
         end
         
-        columns = lines.shift.split("\t").map {|elt| elt.strip }
-        expected_size = columns.size
+        file_columns = lines.shift.split("\t").map {|elt| elt.strip }
+        expected_size = file_columns.size
+        columns = file_columns
         data = Eprime::Data.new(columns)
         current_line = @skip_lines+1
         lines.each do |line|
