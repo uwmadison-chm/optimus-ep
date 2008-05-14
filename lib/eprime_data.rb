@@ -106,7 +106,7 @@ module Eprime
       index = @columns.length - 1
       @column_hash[col_id] = index
       if @columns_set_in_initialize and not @options[:ignore_warnings]
-        raise ColumnAddedWarning.new("Warning: Added column #{col_id} after specifying columns at init", index)
+        raise ColumnAddedWarning.new("Error: Added column #{col_id} after specifying columns at init", index)
       end
       return index
     end

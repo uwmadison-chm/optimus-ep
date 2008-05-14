@@ -40,9 +40,15 @@ module Eprime
     def convert
       eprime = Eprime::Data.new(@columns, :ignore_warnings => @options[:force])
       @options[:files].each do |filename|
-        File.open(filename, 'r') do |f|
-          reader = Eprime::Reader.new(f, {:columns => @columns, :force => @options[:force]})
-          eprime.merge!(reader.eprime_data)
+        begin
+          File.open(filename, 'r') do |f|
+            reader = Eprime::Reader.new(f, {:columns => @columns, :force => @options[:force]})
+            eprime.merge!(reader.eprime_data)
+          end
+        rescue Exception => e
+          @err.puts e.message
+          @err.puts "Use --force to try processing anyhow"
+          exit(1)
         end
       end
       writer = Eprime::TabfileWriter.new(eprime, data_out, {
