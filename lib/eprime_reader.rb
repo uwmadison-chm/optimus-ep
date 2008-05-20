@@ -5,6 +5,10 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
+require 'log_file_parser'
+require 'excel_parser'
+require 'eprimetab_parser'
+
 module Eprime
   
   # A class that should open any type of E-Prime text file and read it into

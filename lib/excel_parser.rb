@@ -7,6 +7,8 @@
 
 # This almost completely delegates to TabfileParser
 
+require 'tabfile_parser'
+
 module Eprime
   class Reader
     class ExcelParser < TabfileParser

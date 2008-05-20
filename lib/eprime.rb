@@ -5,14 +5,12 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-# Require the entire package
-require File.dirname(__FILE__)+'/log_file_parser'
-require File.dirname(__FILE__)+'/eprime_data'
-require File.dirname(__FILE__)+'/tabfile_parser'
-require File.dirname(__FILE__)+'/tabfile_writer'
-require File.dirname(__FILE__)+'/excel_parser'
-require File.dirname(__FILE__)+'/eprimetab_parser'
-require File.dirname(__FILE__)+'/eprime_reader'
+# Add our lib to the search path
+$: << File.expand_path(File.join(File.dirname(__FILE__), "..", "lib"))
+
+require 'eprime_data'
+require 'tabfile_writer'
+require 'eprime_reader'
 
 module Eprime
 
