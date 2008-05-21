@@ -44,4 +44,16 @@ module EprimeTestHelper
     end
     return data
   end
+  
+  def mock_edata
+    data = Eprime::Data.new()
+    row = data.add_row
+    row['stim_time'] = '3188'
+    row['run_start'] = '2400'
+    row = data.add_row
+    row['stim_time'] = '4515'
+    row['run_start'] = '2400'
+    return data
+  end
+  
 end
