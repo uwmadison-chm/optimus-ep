@@ -91,8 +91,8 @@ module Eprime
     end
     
     def find_column_index(col_id)
-      if (col_id.is_a?(Fixnum) or col_id.to_i.to_s == col_id)
-        return col_id.to_i
+      if col_id.is_a? Fixnum
+        return (col_id < @columns.size) ? col_id : nil
       end
       # Short-circuit this 
       @column_hash[col_id] if @column_hash[col_id]
@@ -100,7 +100,10 @@ module Eprime
     
     def find_or_add_column_index(col_id)
       index_id = find_column_index(col_id)
-      return index_id if index_id
+      # If index_id was a string, nil means we may want to add it. If it's a
+      # numeric index, we want to return nil from here -- we're not gonna add unnamed
+      # indexes.
+      return index_id if index_id or col_id.is_a?(Fixnum)
       # In this case, we're adding a column...
       @columns << col_id
       index = @columns.length - 1
@@ -127,7 +130,7 @@ module Eprime
       
       def []=(index, value)
         num_index = @parent.find_or_add_column_index(index)
-        unless (@parent.columns.length > num_index)
+        if num_index.nil?
           raise IndexError.new("Column #{num_index} does not exist")
         end
         @data[num_index] = value

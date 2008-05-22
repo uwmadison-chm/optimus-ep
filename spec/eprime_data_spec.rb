@@ -46,12 +46,6 @@ shared_examples_for "Eprime::Data with one row" do
     @row[index].should == "bitten"
   end
 
-  it "should treat numeric string indexes like numeric indexes" do
-    @row[INITIAL_COLUMNS[0]] = "kitten"
-    index = @data.find_column_index(INITIAL_COLUMNS[0])
-    @row[index.to_s].should == "kitten"
-  end
-
   it "should raise when setting out-of-bound column value" do
     lambda {
       @row[@data.columns.length] = "kitten"
