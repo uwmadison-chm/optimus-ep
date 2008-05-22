@@ -10,11 +10,17 @@ module Eprime
     attr_writer :data
     attr_reader :columns
     
+    include Enumerable
+    
     def initialize
       @computed_column_names = []
       @computed_col_name_hash = {}
       @columns = []
       @rows = []
+    end
+    
+    def data_columns
+      @data.columns
     end
     
     def data=(data)
@@ -31,6 +37,13 @@ module Eprime
       @rows.size
     end
     
+    def each
+      @rows.each do |row|
+        yield row
+      end
+      @rows
+    end
+    
     def computed_column(name, expression)
       @computed_column_names << name
       @computed_col_name_hash[name] = @computed_column_names.size - 1
@@ -38,12 +51,16 @@ module Eprime
     end
     
     def column_index(col_id)
-      # First, check data
+      if col_id.is_a? Fixnum
+        return (col_id < @columns.size) ? col_id : nil
+      end
+      # First, see if it's a data column
       index = @data.find_column_index(col_id)
       if index.nil?
-        if @computed_col_name_hash[col_id]
-          index = @data.columns.size + @computed_col_name_hash[col_id]
-        end
+        # Find the colum in our own hash and add the number of data columns to it
+        # if necessary
+        index = @computed_col_name_hash[col_id]
+        index += @data.columns.size if index
       end
       return index
     end
@@ -66,7 +83,12 @@ module Eprime
       
       def [](col_id)
         index = @parent.column_index(col_id)
-        return @data[index]
+        raise IndexError.new("Column #{col_id} does not exist") if index.nil?
+        if index < @parent.data_columns.size
+          return @data[index]
+        else
+          return nil
+        end
       end
     end
   end
