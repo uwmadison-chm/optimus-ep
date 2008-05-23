@@ -5,6 +5,8 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
+require 'calculator'
+
 module Eprime
   class ColumnCalculator
     attr_writer :data
@@ -15,6 +17,7 @@ module Eprime
     def initialize
       @computed_column_names = []
       @computed_col_name_hash = {}
+      @expressions = []
       @columns = []
       @rows = []
     end
@@ -30,6 +33,7 @@ module Eprime
     end
         
     def [](index)
+      compute_rows!
       return @rows[index]
     end
     
@@ -37,15 +41,9 @@ module Eprime
       @rows.size
     end
     
-    def each
-      @rows.each do |row|
-        yield row
-      end
-      @rows
-    end
-    
     def computed_column(name, expression)
       @computed_column_names << name
+      @expressions << expression
       @computed_col_name_hash[name] = @computed_column_names.size - 1
       @columns << name
     end
@@ -65,7 +63,21 @@ module Eprime
       return index
     end
     
+    def each
+      @rows.each_index do |row_index|
+        yield self[row_index]
+      end
+      @rows
+    end
+    
+    protected    
+    
     private
+    
+    def self.make_calculator
+      @@calculator = ::Eprime::Calculator.new
+    end
+    make_calculator
     
     def set_rows!(data)
       @rows = []
@@ -74,11 +86,22 @@ module Eprime
       end
     end
     
+    def compute_rows!
+      @rows.each do |row|
+        @expressions.each_index do |index|
+          row.computed_data[index] = @@calculator.compute(@expressions[index])
+        end
+      end
+    end
+    
     
     class Row
+      attr_reader :computed_data
+      
       def initialize(rowdata, parent)
         @data = rowdata
         @parent = parent
+        @computed_data = []
       end
       
       def [](col_id)
@@ -87,9 +110,10 @@ module Eprime
         if index < @parent.data_columns.size
           return @data[index]
         else
-          return nil
+          return @computed_data[index - @parent.data_columns.size - 1]
         end
       end
+      
     end
   end
 end

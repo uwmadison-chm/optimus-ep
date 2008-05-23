@@ -121,7 +121,21 @@ describe Eprime::ColumnCalculator do
     
     it_should_behave_like "Eprime::ColumnCalculator with edata"
     
-    it "should compute constants"
+    
+    it "should compute constants" do 
+      @calc.computed_column "always_1", "1" 
+      @calc.all? { |row|
+        row["always_1"] == "1" 
+      }.should be_true 
+    end
+    
+    it "should compute with add, mul, and grouping" do
+      # Rely on calculator_spec for exhaustive testing of the parser
+      @calc.computed_column "add_mul", "5*(6+2)"
+      @calc.all? {|row|
+        row["add_mul"] == (5*(6+2)).to_s
+      }.should be_true
+    end
   end
   
 end
