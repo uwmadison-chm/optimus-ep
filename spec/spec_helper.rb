@@ -28,6 +28,18 @@ module EprimeTestHelper
     SORTED_COLUMNS = STD_COLUMNS.sort
     
     SHORT_COLUMNS = ["ExperimentName", "Subject"]
+
+    EXPRS = {
+      :const            => ["1",        lambda { 1 }],
+      :add              => ["1+3",      lambda { 1+3 }],
+      :mul              => ["2*4",      lambda { 2*4 }],
+      :add_neg          => ["4 + -5",   lambda { 4 + -5 }],
+      :add_mul_group    => ["4*(3+2)",  lambda { 4*(3+2) }],
+      :fdiv             => ["9/2.0",    lambda { 9/2.0 }],
+      :fmul             => ["0.44*10",  lambda { 0.44*10 }],
+      :mod              => ["10 % 4",   lambda { 10 % 4}]
+    }
+
   end
   
   
@@ -54,6 +66,14 @@ module EprimeTestHelper
     row['stim_time'] = '4515'
     row['run_start'] = '2400'
     return data
+  end
+  
+  def es(sym)
+    EXPRS[sym][0]
+  end
+  
+  def ev(sym)
+    EXPRS[sym][1].call.to_s
   end
   
 end
