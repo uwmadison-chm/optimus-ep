@@ -89,9 +89,21 @@ module Eprime
     def compute_rows!
       @rows.each do |row|
         @expressions.each_index do |index|
-          row.computed_data[index] = @@calculator.compute(@expressions[index])
+          exp = @expressions[index].dup
+          cols = columns_to_replace(exp)
+          cols.each do |col|
+            col.strip!
+            exp.gsub!("{#{col}}", row[col])
+          end
+          row.computed_data[index] = @@calculator.compute(exp)
         end
       end
+    end
+    
+    
+    # Finds an array of strings surrounded by {} characters
+    def columns_to_replace(expression)
+      return expression.scan(/\{([^}]*)\}/).flatten
     end
     
     
@@ -114,6 +126,47 @@ module Eprime
         end
       end
       
+    end
+    
+    class ExpressionList
+      def initialize(data)
+        @data = data
+        @expr_hash = {}
+      end
+      
+      def []=(name, expr_str)
+        @expr_hash[name] = expr_str
+        @compute_order = nil
+      end
+      
+      def [](name)
+        @expr_hash[name]
+      end
+      
+      private
+      def determine_order
+        # There's an elegant recursive algorithm to do everything I want
+        # It isn't found here
+      end
+    end
+    
+    class Expression
+      attr_reader :columns
+      
+      COLUMN_FINDER = /\{([^}]*)\}/ # Finds strings like {foo} and {bar}
+      def initialize(expr_string)
+        @expr = expr_string
+        @columns = find_columns(expr_string).freeze
+      end
+      
+      def to_s
+        @expr.dup
+      end
+      
+      private
+      def find_columns(str)
+        return str.scan(COLUMN_FINDER).flatten
+      end
     end
   end
 end

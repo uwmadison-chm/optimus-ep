@@ -29,7 +29,7 @@ module EprimeTestHelper
     
     SHORT_COLUMNS = ["ExperimentName", "Subject"]
 
-    EXPRS = {
+    CONST_EXPRS = {
       :const            => ["1",        lambda { 1 }],
       :add              => ["1+3",      lambda { 1+3 }],
       :mul              => ["2*4",      lambda { 2*4 }],
@@ -38,6 +38,11 @@ module EprimeTestHelper
       :fdiv             => ["9/2.0",    lambda { 9/2.0 }],
       :fmul             => ["0.44*10",  lambda { 0.44*10 }],
       :mod              => ["10 % 4",   lambda { 10 % 4}]
+    }
+    
+    COMP_EXPRS = {
+      'stim_offset'     => '{stim_time} - {run_start}',
+      'stim_offset_s'   => '{stim_offset}/1000'
     }
 
   end
@@ -69,11 +74,11 @@ module EprimeTestHelper
   end
   
   def es(sym)
-    EXPRS[sym][0]
+    CONST_EXPRS[sym][0]
   end
   
   def ev(sym)
-    EXPRS[sym][1].call.to_s
+    CONST_EXPRS[sym][1].call.to_s
   end
   
 end

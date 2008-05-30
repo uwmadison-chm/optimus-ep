@@ -119,9 +119,6 @@ describe Eprime::ColumnCalculator do
   
   describe "(statically computing columns)" do
     
-    it_should_behave_like "Eprime::ColumnCalculator with edata"
-    
-    
     it "should compute constants" do 
       @calc.computed_column "always_1", "1" 
       @calc.all? { |row|
@@ -136,6 +133,81 @@ describe Eprime::ColumnCalculator do
         row["add_mul"] == (5*(6+2)).to_s
       }.should be_true
     end
+    
+    it "should work with multiple computed columns" do
+      @calc.computed_column "always_1", "1"
+      @calc.computed_column "add_mul", "5*(6+2)"
+      
+      @calc.each do |row|
+        #row["always_1"].should == "1"
+        #row["add_mul"].should == (5*(6+2)).to_s
+      end
+    end
   end
   
+  describe "(with replaced columns)" do
+    
+    it "should compute based on data columns" do
+      @calc.computed_column "stim_time_s", "{stim_time}/1000"
+      @calc.each do |row|
+        row["stim_time_s"].should == (row["stim_time"].to_f/1000.0).to_s
+      end
+    end
+    
+    it "should allow math between two columns" do
+      @calc.computed_column "stim_from_run", "{stim_time}-{run_start}"
+      @calc.each do |row|
+        row['stim_from_run'].should == (row['stim_time'].to_i - row['run_start'].to_i).to_s
+      end
+    end
+    
+    it "should allow columns based on other computed columns"
+      #@calc.computed_column "stim_from_run", "{stim_time}-{run_start}"
+      #@calc.computed_column "stim_run_s", "788 / 1000"
+      #@calc[0]['stim_run_s'].should == (788/1000.0).to_s
+      #@calc[0]['stim_run_s'].should == ((@calc[0]['stim_time'].to_f - @calc[0]['run_start'].to_f)/1000.0).to_s
+    #end
+    
+  end
+  
+end
+
+describe Eprime::ColumnCalculator::Expression do
+  before :each do
+    @expr_str = "({stim_time}-{run_start}) / 1000"
+    @expr = Eprime::ColumnCalculator::Expression.new(@expr_str)
+  end
+  
+  it "should find two columns" do
+    @expr.columns.size.should == 2
+  end
+  
+  it "should split into stim_time and run_start" do
+    @expr.columns.sort.should == %w(stim_time run_start).sort
+  end
+  
+  it "should not allow changing columns" do
+    lambda {
+      @expr.columns << 'wakka'
+    }.should raise_error(TypeError)
+  end
+  
+  it "should convert to a lovely string" do
+    @expr.to_s.should == @expr_str
+  end
+end
+
+describe Eprime::ColumnCalculator::ExpressionList do
+  before :each do
+    @edata = mock_edata
+    @list = Eprime::ColumnCalculator::ExpressionList.new(@edata)
+  end
+  
+  it "should allow adding expressions" do
+    lambda {
+      COMP_EXPRS.each do |name, expr_str|
+        @list[name] = expr_str
+      end
+    }.should_not raise_error
+  end
 end
