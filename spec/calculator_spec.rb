@@ -14,7 +14,6 @@ include EprimeTestHelper
 describe Eprime::Calculator do
   before :all do
     @calc = Eprime::Calculator.new
-    @x = EXPRS
   end
   
   it "should compute constants" do
