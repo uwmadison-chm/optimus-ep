@@ -44,6 +44,19 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
   it "should return nil when searching for out-of-bound numeric indexes" do
     @calc.column_index(@calc.columns.size).should be_nil
   end
+  
+  it "should return a nil computed_index for data columns" do
+    @calc.computed_index('stim_time').should be_nil
+  end
+  
+  it "should return a nil computed_index for nonexistent columns" do
+    @calc.computed_index('not_present').should be_nil
+  end
+  
+  it "should not return a nil computed_index for a computed_column" do
+    @calc.computed_column NEW_COLUMN, "1"
+    @calc.computed_index(NEW_COLUMN).should == (@calc.columns.size - @edata.columns.size - 1)
+  end
 
   it "should allow setting a column" do
     lambda {
@@ -72,6 +85,14 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
     get_index = @calc.columns.size
     @calc.computed_column NEW_COLUMN, '1'
     @calc.column_index(get_index).should == get_index
+  end
+  
+  it "should know when columns are computed" do
+    @calc.computed_column NEW_COLUMN, "1"
+    @calc.is_computed?('stim_time').should be_false
+    @calc.is_computed?(NEW_COLUMN).should be_true
+    @calc.is_computed?(0).should be_false
+    @calc.is_computed?(@calc.columns.size-1).should be_true
   end
   
   it "should allow named indexing for computed columns" do
@@ -118,29 +139,64 @@ describe Eprime::ColumnCalculator do
   end
   
   describe "(statically computing columns)" do
-    
-    it "should compute constants" do 
-      @calc.computed_column "always_1", "1" 
-      @calc.all? { |row|
-        row["always_1"] == "1" 
-      }.should be_true 
+
+    it "should return data for data columns" do
+      @edata[0]['stim_time'].should_not be_nil
+      @calc[0].compute('stim_time').should == @edata[0]['stim_time']
     end
     
-    it "should compute with add, mul, and grouping" do
-      # Rely on calculator_spec for exhaustive testing of the parser
+    it "should compute static columns on single rows" do
+      @calc.computed_column "always_1", "1"
+      @calc[0].compute("always_1").should == "1"
+    end
+    
+    it "should compute on single rows with some math" do
+      @calc.computed_column "test", "(3+2)*4"
+      @calc[0].compute("test").should == ((3+2)*4).to_s
+    end
+    
+    it "should allow adding two columns" do 
+      @calc.computed_column "always_1", "1"
+      @calc.computed_column "test", "(3+2)*4"
+      @calc[0].compute("always_1").should == "1"
+      @calc[0].compute("test").should == ((3+2)*4).to_s
+    end
+    
+    it "should find the proper index when adding two computed columns" do
+      @calc.computed_column "always_1", "1"
+      i1 = @calc.computed_index("always_1")
+      @calc.computed_column "test", "(3+2)*4"
+      i2 = @calc.computed_index("test")
+      i1.should == 0
+      i2.should == 1
+    end
+    
+    it "should raise when computing nonexistent column" do
+      lambda {
+        @calc[0].compute('nonexistent')
+      }.should raise_error
+    end
+
+    it "should compute constants via indexing" do 
+      @calc.computed_column "always_1", "1"
+       @calc[0]["always_1"].should == "1"
+    end
+    
+    it "should compute with add, mul, and grouping via indexing" do
+      # See calculator_spec.rb for exhaustive testing of the parser
       @calc.computed_column "add_mul", "5*(6+2)"
-      @calc.all? {|row|
-        row["add_mul"] == (5*(6+2)).to_s
-      }.should be_true
+      @calc.each do |row|
+        row["add_mul"].should == (5*(6+2)).to_s
+      end
     end
     
-    it "should work with multiple computed columns" do
+    it "should work with multiple computed columns via indexing" do
       @calc.computed_column "always_1", "1"
       @calc.computed_column "add_mul", "5*(6+2)"
       
       @calc.each do |row|
-        #row["always_1"].should == "1"
-        #row["add_mul"].should == (5*(6+2)).to_s
+        row["always_1"].should == "1"
+        row["add_mul"].should == (5*(6+2)).to_s
       end
     end
   end
@@ -161,12 +217,39 @@ describe Eprime::ColumnCalculator do
       end
     end
     
-    it "should allow columns based on other computed columns"
-      #@calc.computed_column "stim_from_run", "{stim_time}-{run_start}"
-      #@calc.computed_column "stim_run_s", "788 / 1000"
-      #@calc[0]['stim_run_s'].should == (788/1000.0).to_s
-      #@calc[0]['stim_run_s'].should == ((@calc[0]['stim_time'].to_f - @calc[0]['run_start'].to_f)/1000.0).to_s
-    #end
+    it "should allow columns based on other computed columns" do
+      @calc.computed_column "stim_from_run", "{stim_time}-{run_start}"
+      @calc.computed_column "stim_run_s", "{stim_from_run} / 1000"
+      @calc.each do |row|
+        row['stim_run_s'].should == ((row['stim_time'].to_f - row['run_start'].to_f)/1000.0).to_s
+      end
+    end
+    
+    it "should fail to compute with nonexistent columns" do
+      @calc.computed_column "borked", "{stim_time} - {not_there}"
+      lambda {
+        @calc[0]["borked"]
+      }.should raise_error(IndexError)
+    end
+    
+    it "should detect loops in column computation" do
+      @calc.computed_column "loop1", "{stim_time} - {run_start} - {loop3}"
+      @calc.computed_column "loop2", "{loop1}"
+      @calc.computed_column "loop3", "{loop2}"
+      @calc.computed_column "loop4", "{loop3}"
+      lambda {
+        @calc[0]['loop4']
+      }.should raise_error(Eprime::ColumnCalculator::ComputationError)
+    end
+    
+    it "should compute columns even when there are two paths to a node" do
+      @calc.computed_column "c1", "{stim_time} - {run_start}"
+      @calc.computed_column "c2", "{c1}"
+      @calc.computed_column "c3", "{c1} - {c2}"
+      lambda {
+        @calc[0]["c3"]
+      }.should_not raise_error
+    end
     
   end
   
@@ -192,22 +275,8 @@ describe Eprime::ColumnCalculator::Expression do
     }.should raise_error(TypeError)
   end
   
-  it "should convert to a lovely string" do
+  it "should convert to a string" do
     @expr.to_s.should == @expr_str
   end
 end
 
-describe Eprime::ColumnCalculator::ExpressionList do
-  before :each do
-    @edata = mock_edata
-    @list = Eprime::ColumnCalculator::ExpressionList.new(@edata)
-  end
-  
-  it "should allow adding expressions" do
-    lambda {
-      COMP_EXPRS.each do |name, expr_str|
-        @list[name] = expr_str
-      end
-    }.should_not raise_error
-  end
-end

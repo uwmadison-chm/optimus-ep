@@ -17,7 +17,7 @@ module Eprime
     def initialize
       @computed_column_names = []
       @computed_col_name_hash = {}
-      @expressions = []
+      @expressions = {}
       @columns = []
       @rows = []
     end
@@ -30,10 +30,11 @@ module Eprime
       @data = data
       set_rows!(@data)
       @columns = @data.columns + @computed_column_names
+      @computed = false
     end
         
     def [](index)
-      compute_rows!
+      compute_data! unless @computed
       return @rows[index]
     end
     
@@ -43,9 +44,11 @@ module Eprime
     
     def computed_column(name, expression)
       @computed_column_names << name
-      @expressions << expression
+      @expressions[name] = Expression.new(expression)
+      
       @computed_col_name_hash[name] = @computed_column_names.size - 1
       @columns << name
+      @computed = false
     end
     
     def column_index(col_id)
@@ -63,6 +66,27 @@ module Eprime
       return index
     end
     
+    def is_computed?(col_id)
+      index = column_index(col_id)
+      if index.nil? or index >= @data.columns.size
+        return true
+      else
+        return false
+      end
+    end
+    
+    def computed_index(col_id)
+      index = column_index(col_id)
+      return nil if index.nil?
+      if index >= @data.columns.size
+        return index - (@data.columns.size)
+      end
+    end
+    
+    def expression(name)
+      @expressions[name]
+    end
+    
     def each
       @rows.each_index do |row_index|
         yield self[row_index]
@@ -70,10 +94,15 @@ module Eprime
       @rows
     end
     
+    def compute(numeric_expression)
+      @@calculator.compute(numeric_expression)
+    end
+    
     protected    
     
     private
     
+    # Creates the infix calculator -- called at class instantiation time
     def self.make_calculator
       @@calculator = ::Eprime::Calculator.new
     end
@@ -86,26 +115,15 @@ module Eprime
       end
     end
     
-    def compute_rows!
-      @rows.each do |row|
-        @expressions.each_index do |index|
-          exp = @expressions[index].dup
-          cols = columns_to_replace(exp)
-          cols.each do |col|
-            col.strip!
-            exp.gsub!("{#{col}}", row[col])
-          end
-          row.computed_data[index] = @@calculator.compute(exp)
+    def compute_data!
+      @rows.each_index do |row_index|
+        @computed_column_names.each do |col|
+          @rows[row_index].compute(col)
         end
       end
+      @computed = true
     end
-    
-    
-    # Finds an array of strings surrounded by {} characters
-    def columns_to_replace(expression)
-      return expression.scan(/\{([^}]*)\}/).flatten
-    end
-    
+        
     
     class Row
       attr_reader :computed_data
@@ -119,35 +137,45 @@ module Eprime
       def [](col_id)
         index = @parent.column_index(col_id)
         raise IndexError.new("Column #{col_id} does not exist") if index.nil?
-        if index < @parent.data_columns.size
-          return @data[index]
+        if @parent.is_computed?(index)
+          c_index = @parent.computed_index(index)
+          return @computed_data[c_index]
         else
-          return @computed_data[index - @parent.data_columns.size - 1]
+          return @data[index]
         end
       end
       
-    end
-    
-    class ExpressionList
-      def initialize(data)
-        @data = data
-        @expr_hash = {}
-      end
       
-      def []=(name, expr_str)
-        @expr_hash[name] = expr_str
-        @compute_order = nil
-      end
-      
-      def [](name)
-        @expr_hash[name]
+      # Recursively compute this column name and every column on which it depends
+      def compute(col_name, path = [])
+        raise ArgumentError.new("compute requires a column name") unless col_name.is_a? String
+        # The end case for this recursive function
+        # Also handles the error condition where
+        if self[col_name]
+          return self[col_name]
+        end
+
+        expr = @parent.expression(col_name)
+        compute_str = expr.to_s
+
+        # Ensure the path doesn't contain us
+        if path.include?(col_name) 
+          raise ComputationError.new("#{compute_str} contains a loop with #{col_name} -- can't compute")
+        end
+
+        expr.columns.each do |col|
+          val = compute(col, path + [col_name])
+          compute_str.gsub!("{#{col}}", val.to_s)
+        end
+        
+        comp_index = @parent.computed_index(col_name)
+        val = @parent.compute(compute_str)
+        @computed_data[comp_index] = val
+        return @computed_data[comp_index]
       end
       
       private
-      def determine_order
-        # There's an elegant recursive algorithm to do everything I want
-        # It isn't found here
-      end
+      
     end
     
     class Expression
@@ -167,6 +195,10 @@ module Eprime
       def find_columns(str)
         return str.scan(COLUMN_FINDER).flatten
       end
+    end
+    
+    class ComputationError < Exception
+      
     end
   end
 end
