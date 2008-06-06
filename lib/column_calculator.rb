@@ -12,79 +12,55 @@ module Eprime
     attr_writer :data
     attr_reader :columns
     
+    # Order is important here -- data columns must come first!
+    COLUMN_TYPES = %w(data_cols computed_cols)
     include Enumerable
     
     def initialize
-      @computed_column_names = []
-      @computed_col_name_hash = {}
-      @expressions = {}
       @columns = []
+      @columns_intern = []
+      @column_indexes = {}
       @rows = []
-    end
-    
-    def data_columns
-      @data.columns
+      COLUMN_TYPES.each do |type|
+        instance_variable_set("@#{type}", [])
+      end
     end
     
     def data=(data)
       @data = data
-      set_rows!(@data)
-      @columns = @data.columns + @computed_column_names
-      @computed = false
+      
+      @data_cols = []
+      @data.columns.each do |col_name|
+        @data_cols << DataColumn.new(col_name, @data)
+      end
+      set_columns!
     end
-        
+    
     def [](index)
       compute_data! unless @computed
       return @rows[index]
     end
     
+    def column_index(col_id)
+      if col_id.is_a? Fixnum
+        return (col_id >= 0 and col_id < @columns.size) ? col_id : nil
+      end
+      return @column_indexes[col_id]
+    end
+    
+    def column(col_id)
+      index = column_index(col_id)
+      raise IndexError.new("#{col_id} does not exist") if index.nil?
+      return @columns_intern[index]
+    end
+    
     def size
-      @rows.size
+      @data.size
     end
     
     def computed_column(name, expression)
-      @computed_column_names << name
-      @expressions[name] = Expression.new(expression)
-      
-      @computed_col_name_hash[name] = @computed_column_names.size - 1
-      @columns << name
-      @computed = false
-    end
-    
-    def column_index(col_id)
-      if col_id.is_a? Fixnum
-        return (col_id < @columns.size) ? col_id : nil
-      end
-      # First, see if it's a data column
-      index = @data.find_column_index(col_id)
-      if index.nil?
-        # Find the colum in our own hash and add the number of data columns to it
-        # if necessary
-        index = @computed_col_name_hash[col_id]
-        index += @data.columns.size if index
-      end
-      return index
-    end
-    
-    def is_computed?(col_id)
-      index = column_index(col_id)
-      if index.nil? or index >= @data.columns.size
-        return true
-      else
-        return false
-      end
-    end
-    
-    def computed_index(col_id)
-      index = column_index(col_id)
-      return nil if index.nil?
-      if index >= @data.columns.size
-        return index - (@data.columns.size)
-      end
-    end
-    
-    def expression(name)
-      @expressions[name]
+      @computed_cols << ComputedColumn.new(name, Expression.new(expression))
+      set_columns!
     end
     
     def each
@@ -94,13 +70,33 @@ module Eprime
       @rows
     end
     
-    def compute(numeric_expression)
+    def self.compute(numeric_expression)
       @@calculator.compute(numeric_expression)
     end
     
-    protected    
-    
     private
+    
+    def add_column(column)
+      # Raise an error if the column already exists
+      
+      # Save the index
+      @column_indexes[column.name] = @columns_intern.size
+      @columns_intern << column
+      @columns << column.name
+    end
+    
+    def set_columns!
+      @columns = []
+      @columns_intern = []
+      @column_indexes = {}
+      COLUMN_TYPES.each do |type|
+        ar = instance_variable_get("@#{type}")
+        ar.each do |col|
+          add_column(col)
+        end
+      end
+      @computed = false
+    end
     
     # Creates the infix calculator -- called at class instantiation time
     def self.make_calculator
@@ -108,70 +104,102 @@ module Eprime
     end
     make_calculator
     
-    def set_rows!(data)
-      @rows = []
-      data.each do |r|
-        @rows << Row.new(r, self)
-      end
-    end
-    
     def compute_data!
-      @rows.each_index do |row_index|
-        @computed_column_names.each do |col|
-          @rows[row_index].compute(col)
+      @rows = []
+      @data.each_index do |row_index|
+        row = Row.new(self, @data[row_index])
+        COLUMN_TYPES.each do |type|
+          ar = instance_variable_get("@#{type}")
+          ar.each do |col|
+            row.compute(col.name)
+          end
         end
+        @rows << row
       end
       @computed = true
     end
+    
+    class Column
+      attr_accessor :name
+      
+      def initialize(name)
+        @name = name
+      end
+      
+      # This should be overridden by subclasses
+      def compute(row, path = [])
+        return row[@name]
+      end
+    end
+    
+    class DataColumn < Column
+      def initialize(name, data)
+        @data_index = data.find_column_index(name)
+        @data = data
+        super(name)
+      end
+    end
+    
+    class ComputedColumn < Column
+      attr_accessor :expression
+      
+      def initialize(name, expression)
+        @expression = expression
+        super(name)
+      end
+      
+      def compute(row, path = [])
+        return super(row) if super(row)
         
+        compute_str = @expression.to_s
+        if path.include?(@name) 
+          raise ComputationError.new("#{compute_str} contains a loop with #{@name} -- can't compute")
+        end
+
+        column_names = @expression.columns
+        column_names.each do |col_name|
+          col = row.find_column(col_name)
+          val = col.compute(row, path+[@name])
+          compute_str.gsub!("{#{col_name}}", val)
+        end
+        return ::Eprime::ColumnCalculator.compute(compute_str)
+      end
+    end
     
     class Row
       attr_reader :computed_data
       
-      def initialize(rowdata, parent)
-        @data = rowdata
+      def initialize(parent, rowdata)
         @parent = parent
+        @rowdata = rowdata
         @computed_data = []
+        # Add all the data columns to computed_data
+        rowdata.columns.each do |dcol_name|
+          index = @parent.column_index(dcol_name)
+          @computed_data[index] = rowdata[dcol_name]
+        end
       end
       
       def [](col_id)
-        index = @parent.column_index(col_id)
-        raise IndexError.new("Column #{col_id} does not exist") if index.nil?
-        if @parent.is_computed?(index)
-          c_index = @parent.computed_index(index)
-          return @computed_data[c_index]
-        else
-          return @data[index]
+        if @parent.column_index(col_id).nil?
+          raise IndexError.new("#{col_id} does not exist")
         end
+        return @computed_data[@parent.column_index(col_id)]
+      end
+      
+      def find_column(column_name)
+        @parent.column(column_name)
       end
       
       
       # Recursively compute this column name and every column on which it depends
-      def compute(col_name, path = [])
+      def compute(col_name)
         raise ArgumentError.new("compute requires a column name") unless col_name.is_a? String
-        # The end case for this recursive function
-        # Also handles the error condition where
-        if self[col_name]
-          return self[col_name]
-        end
-
-        expr = @parent.expression(col_name)
-        compute_str = expr.to_s
-
-        # Ensure the path doesn't contain us
-        if path.include?(col_name) 
-          raise ComputationError.new("#{compute_str} contains a loop with #{col_name} -- can't compute")
-        end
-
-        expr.columns.each do |col|
-          val = compute(col, path + [col_name])
-          compute_str.gsub!("{#{col}}", val.to_s)
-        end
         
-        comp_index = @parent.computed_index(col_name)
-        val = @parent.compute(compute_str)
-        @computed_data[comp_index] = val
-        return @computed_data[comp_index]
+        index = @parent.column_index(col_name)
+        col = @parent.column(col_name)
+        @computed_data[index] = col.compute(self)
+        return @computed_data[index]
       end
       
       private

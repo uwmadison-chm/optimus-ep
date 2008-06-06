@@ -136,6 +136,10 @@ module Eprime
         @data[num_index] = value
       end
       
+      def columns
+        @parent.columns
+      end
+      
       def values
         vals = []
         @parent.columns.each_index do |i|

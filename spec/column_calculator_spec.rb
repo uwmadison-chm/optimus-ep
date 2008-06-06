@@ -45,19 +45,6 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
     @calc.column_index(@calc.columns.size).should be_nil
   end
   
-  it "should return a nil computed_index for data columns" do
-    @calc.computed_index('stim_time').should be_nil
-  end
-  
-  it "should return a nil computed_index for nonexistent columns" do
-    @calc.computed_index('not_present').should be_nil
-  end
-  
-  it "should not return a nil computed_index for a computed_column" do
-    @calc.computed_column NEW_COLUMN, "1"
-    @calc.computed_index(NEW_COLUMN).should == (@calc.columns.size - @edata.columns.size - 1)
-  end
-
   it "should allow setting a column" do
     lambda {
       @calc.computed_column NEW_COLUMN, "1"
@@ -70,9 +57,10 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
   end
   
   it "should increse in column size when setting computed column" do
-    lambda {
-      @calc.computed_column NEW_COLUMN, "1"
-    }.should change(@calc.columns, :size).by(1)
+    s1 = @calc.columns.size
+    @calc.computed_column NEW_COLUMN, "1"
+    s2 = @calc.columns.size
+    s2.should == s1+1
   end
   
   it "should compute the proper column index for computed columns" do
@@ -85,14 +73,6 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
     get_index = @calc.columns.size
     @calc.computed_column NEW_COLUMN, '1'
     @calc.column_index(get_index).should == get_index
-  end
-  
-  it "should know when columns are computed" do
-    @calc.computed_column NEW_COLUMN, "1"
-    @calc.is_computed?('stim_time').should be_false
-    @calc.is_computed?(NEW_COLUMN).should be_true
-    @calc.is_computed?(0).should be_false
-    @calc.is_computed?(@calc.columns.size-1).should be_true
   end
   
   it "should allow named indexing for computed columns" do
@@ -162,19 +142,10 @@ describe Eprime::ColumnCalculator do
       @calc[0].compute("test").should == ((3+2)*4).to_s
     end
     
-    it "should find the proper index when adding two computed columns" do
-      @calc.computed_column "always_1", "1"
-      i1 = @calc.computed_index("always_1")
-      @calc.computed_column "test", "(3+2)*4"
-      i2 = @calc.computed_index("test")
-      i1.should == 0
-      i2.should == 1
-    end
-    
     it "should raise when computing nonexistent column" do
       lambda {
         @calc[0].compute('nonexistent')
-      }.should raise_error
+      }.should raise_error(IndexError)
     end
 
     it "should compute constants via indexing" do 
