@@ -19,19 +19,19 @@ module Eprime
     include Functors
     
     Mod = lambda { |x, y| x.to_i % y.to_i }
+    Eql = lambda { |x, y| x.to_s == y.to_s }
     
     def initialize
       ops = OperatorTable.new.
-        infixl(char(?+) >> Plus, 20).
-        infixl(char(?-) >> Minus, 20).
-        infixl(char(?*) >> Mul, 40).
-        infixl(char(?/) >> Div, 40).
-        infixl(char(?%) >> Mod, 40).
-        prefix(char(?-) >> Neg, 60)
+        infixl(char('+') >> Plus, 20).
+        infixl(char('-') >> Minus, 20).
+        infixl(char('*') >> Mul, 40).
+        infixl(char('/') >> Div, 40).
+        infixl(char('%') >> Mod, 40).
+        prefix(char('-') >> Neg, 60)
       expr = nil
-      #int_parser = integer.map(&To_i) 
       float_parser = number.map(&To_f)
-      grouping_parser = char('(') >>(lazy{expr}) << char(')')
+      grouping_parser = char('(') >>(lazy{expr})<< char(')')
       term = alt(float_parser, grouping_parser)
       delim = whitespace.many_
       expr = delim >> Expressions.build(term, ops, delim)
