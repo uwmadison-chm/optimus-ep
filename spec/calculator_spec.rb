@@ -47,4 +47,10 @@ describe Eprime::Calculator do
   it "should handle mod" do
     @calc.compute(es(:mod)).should == ev(:mod)
   end
+  
+  it "should fail with infix garbage" do
+    lambda {
+      @calc.compute("1 broken 2")
+    }.should raise_error(RParsec::ParserException)
+  end
 end

@@ -35,7 +35,7 @@ module Eprime
       term = alt(float_parser, grouping_parser)
       delim = whitespace.many_
       expr = delim >> Expressions.build(term, ops, delim)
-      @parser = expr
+      @parser = expr << eof
     end
     
     def compute(expression)
