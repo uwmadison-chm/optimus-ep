@@ -13,7 +13,7 @@ module Eprime
     attr_reader :columns
     
     # Order is important here -- data columns must come first!
-    COLUMN_TYPES = %w(data_cols computed_cols)
+    COLUMN_TYPES = %w(data_cols computed_cols copydown_cols)
     include Enumerable
     
     def initialize
@@ -63,8 +63,13 @@ module Eprime
       set_columns!
     end
     
+    def copydown_column(name, copied_name)
+      @copydown_cols << CopydownColumn.new(name, copied_name)
+      set_columns!
+    end
+    
     def each
-      @rows.each_index do |row_index|
+      @data.each_index do |row_index|
         yield self[row_index]
       end
       @rows
@@ -139,6 +144,21 @@ module Eprime
         @data_index = data.find_column_index(name)
         @data = data
         super(name)
+      end
+    end
+    
+    class CopydownColumn < Column
+      def initialize(name, copied_name)
+        super(name)
+        @last_val = ''
+        @copied_name = copied_name
+      end
+      
+      def compute(row, path = [])
+        if !row[@copied_name].to_s.empty?
+          @last_val = row[@copied_name].to_s
+        end
+        return @last_val
       end
     end
     

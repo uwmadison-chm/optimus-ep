@@ -45,15 +45,26 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
     @calc.column_index(@calc.columns.size).should be_nil
   end
   
-  it "should allow setting a column" do
+  it "should allow setting a computed column" do
     lambda {
       @calc.computed_column NEW_COLUMN, "1"
+    }.should_not raise_error
+  end
+  
+  it "should allow setting a copydown column" do
+    lambda {
+      @calc.copydown_column 'sparse_copy', 'sparse'
     }.should_not raise_error
   end
   
   it "should contain new name when setting computed column" do
     @calc.computed_column NEW_COLUMN, "1"
     @calc.columns.should include(NEW_COLUMN)
+  end
+  
+  it "should contain the new name when setting copydown column" do
+    @calc.copydown_column 'sparse_copy', 'sparse'
+    @calc.columns.should include('sparse_copy')
   end
   
   it "should increse in column size when setting computed column" do
@@ -178,7 +189,7 @@ describe Eprime::ColumnCalculator do
     end
   end
   
-  describe "(with replaced columns)" do
+  describe "(with computed columns)" do
     
     it "should compute based on data columns" do
       @calc.computed_column "stim_time_s", "{stim_time}/1000"
@@ -219,7 +230,7 @@ describe Eprime::ColumnCalculator do
       }.should raise_error(Eprime::ColumnCalculator::ComputationError)
     end
     
-    it "should compute columns even when there are two paths to a node" do
+    it "should compute columns when there are two paths to a node" do
       @calc.computed_column "c1", "{stim_time} - {run_start}"
       @calc.computed_column "c2", "{c1}"
       @calc.computed_column "c3", "{c1} - {c2}"
@@ -228,6 +239,22 @@ describe Eprime::ColumnCalculator do
       }.should_not raise_error
     end
     
+  end
+  
+  describe "(with copydown columns)" do
+    before :each do
+      @calc.copydown_column 'sparse_copy', 'sparse'
+    end
+    
+    it "should work" do
+      last_val = ''
+      @calc.each do |row|
+        if !row['sparse'].to_s.empty?
+          last_val = row['sparse'].to_s
+        end
+        row['sparse_copy'].should == last_val
+      end
+    end
   end
   
 end

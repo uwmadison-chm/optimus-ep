@@ -70,6 +70,20 @@ module EprimeTestHelper
     row = data.add_row
     row['stim_time'] = '4515'
     row['run_start'] = '2400'
+    row['sparse'] = '20'
+    row = data.add_row
+    row['stim_time'] = '6515'
+    row['run_start'] = '2400'
+    row = data.add_row
+    row['stim_time'] = '8115'
+    row['run_start'] = '2400'
+    row['sparse'] = '50'
+    row = data.add_row
+    row['stim_time'] = '9815'
+    row['run_start'] = '2400'
+    row = data.add_row
+    row['stim_time'] = '12515'
+    row['run_start'] = '2400'
     return data
   end
   
