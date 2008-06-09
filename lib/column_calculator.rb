@@ -78,7 +78,9 @@ module Eprime
     
     def add_column(column)
       # Raise an error if the column already exists
-      
+      if @column_indexes[column.name]
+        raise ComputationError.new("#{column.name} already exists!")
+      end
       # Save the index
       @column_indexes[column.name] = @columns_intern.size
       @columns_intern << column

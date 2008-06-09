@@ -101,6 +101,12 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
     }.should raise_error(IndexError)
   end
   
+  it "should raise when adding computed column with existing column name" do
+    lambda {
+      @calc.computed_column @edata.columns[0], '1'
+    }.should raise_error(Eprime::ColumnCalculator::ComputationError)
+  end
+  
 end
 
 describe Eprime::ColumnCalculator do
