@@ -262,8 +262,8 @@ describe Eprime::ColumnCalculator do
       @calc.counter_column "count_up"
       i = 0;
       @calc.each do |row|
-        row["count_up"].should == i
         i += 1
+        row["count_up"].should == i
       end
     end
   
@@ -271,8 +271,8 @@ describe Eprime::ColumnCalculator do
       @calc.counter_column "count_up", :start_value => 1
       i = 1
       @calc.each do |row|
-        row["count_up"].should == i
         i += 1
+        row["count_up"].should == i
       end
     end
     
@@ -280,8 +280,8 @@ describe Eprime::ColumnCalculator do
       @calc.counter_column "count_down", :count_by => -1
       i = 0
       @calc.each do |row|
-        row['count_down'].should == i
         i -= 1
+        row['count_down'].should == i
       end
     end
     
@@ -289,8 +289,8 @@ describe Eprime::ColumnCalculator do
       @calc.counter_column "count_succ", :count_by => lambda {|val| val.succ}
       i = 0
       @calc.each do |row|
-        row["count_succ"].should == i
         i = i.succ
+        row["count_succ"].should == i
       end
     end
     
@@ -298,8 +298,8 @@ describe Eprime::ColumnCalculator do
       @calc.counter_column "count_succ", :count_by => :succ
       i = 0
       @calc.each do |row|
-        row['count_succ'].should == i
         i = i.succ
+        row['count_succ'].should == i
       end
     end
     
@@ -307,8 +307,8 @@ describe Eprime::ColumnCalculator do
       @calc.counter_column "count_succ", :count_by => 'succ'
       i = 0
       @calc.each do |row|
-        row['count_succ'].should == i
         i = i.succ
+        row['count_succ'].should == i
       end
     end
     
@@ -317,8 +317,8 @@ describe Eprime::ColumnCalculator do
       
       i = 0
       @calc.each do |row|
-        row['count_on_sparse'].should == i
         i += 1 if !row['sparse'].to_s.empty?
+        row['count_on_sparse'].should == i
       end
     end
     
@@ -327,8 +327,8 @@ describe Eprime::ColumnCalculator do
       i = 0
       @calc.each do |row|
         i = 0 if !row['sparse'].to_s.empty?
-        row['reset_on_sparse'].should == i
         i += 1
+        row['reset_on_sparse'].should == i
       end
     end
   end

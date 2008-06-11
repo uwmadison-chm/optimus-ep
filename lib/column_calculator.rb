@@ -224,7 +224,6 @@ module Eprime
         if @reset_when.call(row)
           @current_value = @start_value
         end
-        rv = @current_value
         
         if @count_when.call(row)
           if @count_by.is_a? Proc
@@ -236,7 +235,7 @@ module Eprime
           end
         end
         
-        return rv
+        return @current_value
       end
     end
     
