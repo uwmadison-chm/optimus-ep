@@ -8,12 +8,23 @@
 require 'calculator'
 
 module Eprime
+
+  # This implements columnwise and accumulator-style calculations for
+  # Eprime data. It generally allows four main kinds of columns:
+  # 1: Data columns -- columns backed directly by data
+  # 2: Computed columns -- columns computed by numerical operations of other columns in the same row
+  # 3: Copydown columns -- Columns equal to the last non-empty value of another column
+  # 4: Counter columns -- Columns that change value based on the contents of other columns -- generally to count.
+  #
+  # It's worth noting: columns may depend on other columns, as long as the dependency isn't circular.
+  # Currently, counter columns may behave strangely when used in and using computed columns -- a parser
+  # like the computed columns' parser is really needed.
+  
   class ColumnCalculator
     attr_writer :data
     attr_reader :columns
     
-    # Order is important here -- data columns must come first!
-    COLUMN_TYPES = %w(data_cols computed_cols copydown_cols)
+    COLUMN_TYPES = %w(data_cols computed_cols copydown_cols counter_cols)
     include Enumerable
     
     def initialize
@@ -65,6 +76,11 @@ module Eprime
     
     def copydown_column(name, copied_name)
       @copydown_cols << CopydownColumn.new(name, copied_name)
+      set_columns!
+    end
+    
+    def counter_column(name, options = {})
+      @counter_cols << CounterColumn.new(name, options)
       set_columns!
     end
     
@@ -163,7 +179,6 @@ module Eprime
     end
     
     class ComputedColumn < Column
-      attr_accessor :expression
       
       def initialize(name, expression)
         @expression = expression
@@ -185,6 +200,43 @@ module Eprime
           compute_str.gsub!("{#{col_name}}", val)
         end
         return ::Eprime::ColumnCalculator.compute(compute_str)
+      end
+    end
+    
+    class CounterColumn < Column
+      STANDARD_OPTS = {
+        :start_value  => 0, 
+        :count_by     => :succ, 
+        :count_when   => lambda {|row| true},
+        :reset_when   => lambda {|row| false}
+      }
+      def initialize(name, options)
+        @options = STANDARD_OPTS.merge(options)
+        @start_value = @options[:start_value]
+        @count_by = @options[:count_by]
+        @count_when = @options[:count_when]
+        @reset_when = @options[:reset_when]
+        @current_value = @start_value
+        super(name)
+      end
+      
+      def compute(row, path = [])
+        if @reset_when.call(row)
+          @current_value = @start_value
+        end
+        rv = @current_value
+        
+        if @count_when.call(row)
+          if @count_by.is_a? Proc
+            @current_value = @count_by.call(@current_value)
+          elsif @count_by.is_a?(Symbol) || @count_by.is_a?(String)
+            @current_value = @current_value.send(@count_by)
+          else
+            @current_value = @current_value + @count_by
+          end
+        end
+        
+        return rv
       end
     end
     

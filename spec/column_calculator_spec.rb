@@ -257,6 +257,81 @@ describe Eprime::ColumnCalculator do
     end
   end
   
+  describe "(with counter columns)" do
+    it "should count up with no options" do
+      @calc.counter_column "count_up"
+      i = 0;
+      @calc.each do |row|
+        row["count_up"].should == i
+        i += 1
+      end
+    end
+  
+    it "should count from 1 when :start_value is set" do
+      @calc.counter_column "count_up", :start_value => 1
+      i = 1
+      @calc.each do |row|
+        row["count_up"].should == i
+        i += 1
+      end
+    end
+    
+    it "should count down when :count_by is -1" do
+      @calc.counter_column "count_down", :count_by => -1
+      i = 0
+      @calc.each do |row|
+        row['count_down'].should == i
+        i -= 1
+      end
+    end
+    
+    it "should count by a proc when specified" do
+      @calc.counter_column "count_succ", :count_by => lambda {|val| val.succ}
+      i = 0
+      @calc.each do |row|
+        row["count_succ"].should == i
+        i = i.succ
+      end
+    end
+    
+    it "should count by a symbol when specified" do
+      @calc.counter_column "count_succ", :count_by => :succ
+      i = 0
+      @calc.each do |row|
+        row['count_succ'].should == i
+        i = i.succ
+      end
+    end
+    
+    it "count by a string when specified" do
+      @calc.counter_column "count_succ", :count_by => 'succ'
+      i = 0
+      @calc.each do |row|
+        row['count_succ'].should == i
+        i = i.succ
+      end
+    end
+    
+    it "should count only when :count_when is true" do
+      @calc.counter_column "count_on_sparse", :count_when => lambda {|row| !row['sparse'].to_s.empty? }
+      
+      i = 0
+      @calc.each do |row|
+        row['count_on_sparse'].should == i
+        i += 1 if !row['sparse'].to_s.empty?
+      end
+    end
+    
+    it "should reset when :reset_when is true" do
+      @calc.counter_column "reset_on_sparse", :reset_when => lambda {|row| !row['sparse'].to_s.empty? }
+      i = 0
+      @calc.each do |row|
+        i = 0 if !row['sparse'].to_s.empty?
+        row['reset_on_sparse'].should == i
+        i += 1
+      end
+    end
+  end
 end
 
 describe Eprime::ColumnCalculator::Expression do
