@@ -21,4 +21,12 @@ describe Eprime::RowFilter do
       row['sparse'].to_s.should_not be_empty
     end
   end
+  
+  it "should filter based on column equal test" do
+    filter = Eprime::RowFilter.new(@edata, ['run_start', 'equals', 2400])
+    filter.to_a.size.should_not == 0
+    filter.each do |row|
+      row['run_start'].should == '2400'
+    end
+  end
 end

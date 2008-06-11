@@ -83,7 +83,7 @@ module EprimeTestHelper
     row['run_start'] = '2400'
     row = data.add_row
     row['stim_time'] = '12515'
-    row['run_start'] = '2400'
+    row['run_start'] = '2800'
     return data
   end
   
