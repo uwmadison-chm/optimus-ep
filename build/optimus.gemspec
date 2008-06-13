@@ -9,7 +9,7 @@ require 'rubygems'
 
 Gem::Specification.new do |s|
   s.name = 'optimus'
-  s.version = '0.3'
+  s.version = '0.5'
   s.platform = Gem::Platform::RUBY
   s.author = "Nathan Vack"
   s.email = "njvack@wisc.edu"
