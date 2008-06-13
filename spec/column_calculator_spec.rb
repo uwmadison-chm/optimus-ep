@@ -220,6 +220,13 @@ describe Eprime::ColumnCalculator do
       }.should raise_error(IndexError)
     end
     
+    it "should assume zero when a column has blank values" do
+      @calc.computed_column "sparse_plus_0", "{sparse} + 0"
+      @calc.each do |row|
+        row["sparse"].to_f.should == row["sparse_plus_0"].to_f
+      end
+    end
+    
     it "should detect loops in column computation" do
       @calc.computed_column "loop1", "{stim_time} - {run_start} - {loop3}"
       @calc.computed_column "loop2", "{loop1}"

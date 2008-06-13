@@ -197,6 +197,9 @@ module Eprime
         column_names.each do |col_name|
           col = row.find_column(col_name)
           val = col.compute(row, path+[@name])
+          if val.to_s.empty?
+            val = "0"
+          end
           compute_str.gsub!("{#{col_name}}", val)
         end
         return ::Eprime::ColumnCalculator.compute(compute_str)
