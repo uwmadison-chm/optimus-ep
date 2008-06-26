@@ -9,7 +9,7 @@
 
 require 'rubygems'
 require 'optparse'
-gem 'optimus'
+gem 'optimus-ep'
 require 'eprime'
 
 module Eprime

@@ -8,7 +8,8 @@
 require 'rubygems' 
 
 Gem::Specification.new do |s|
-  s.name = 'optimus'
+  s.name = 'optimus-ep'
+  s.rubyforge_project = 'optimus-ep'
   s.version = '0.5'
   s.platform = Gem::Platform::RUBY
   s.author = "Nathan Vack"
@@ -23,4 +24,5 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
   s.bindir = "bin"
   s.has_rdoc = false
+  s.add_dependency('rparsec', '>= 1.0')
 end
