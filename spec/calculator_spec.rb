@@ -20,6 +20,14 @@ describe Eprime::Calculator do
     @calc.compute(es(:const)).should == ev(:const)
   end
   
+  it "should allow strings" do
+    @calc.compute(es(:str_const)).should == ev(:str_const)
+  end
+  
+  it "should allow string concatentation" do
+    @calc.compute(es(:str_cat)).should == ev(:str_cat)
+  end
+  
   it "should add" do
     @calc.compute(es(:add)).should == ev(:add)
   end

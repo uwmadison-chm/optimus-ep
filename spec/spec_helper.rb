@@ -37,7 +37,9 @@ module EprimeTestHelper
       :add_mul_group    => ["4*(3+2)",  lambda { 4*(3+2) }],
       :fdiv             => ["9/2.0",    lambda { 9/2.0 }],
       :fmul             => ["0.44*10",  lambda { 0.44*10 }],
-      :mod              => ["10 % 4",   lambda { 10 % 4}]
+      :mod              => ["10 % 4",   lambda { 10 % 4}],
+      :str_const        => ["foo",      lambda { "foo" }],
+      :str_cat          => ["a + a",    lambda { "aa" }]
     }
     
     COMP_EXPRS = {

@@ -31,8 +31,9 @@ module Eprime
         prefix(char('-') >> Neg, 60)
       expr = nil
       float_parser = number.map(&To_f)
+      string_parser = regexp(/[_a-z]\S*/i)
       grouping_parser = char('(') >>(lazy{expr})<< char(')')
-      term = alt(float_parser, grouping_parser)
+      term = alt(float_parser, grouping_parser, string_parser)
       delim = whitespace.many_
       expr = delim >> Expressions.build(term, ops, delim)
       @parser = expr << eof
@@ -40,6 +41,7 @@ module Eprime
     
     def compute(expression)
       ans = @parser.parse(expression)
+      return ans if ans.is_a?(String)
       if (ans - ans.to_i) == 0
         ans = ans.to_i
       end
