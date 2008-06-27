@@ -27,6 +27,12 @@ describe Eprime::Calculator do
   it "should allow string concatentation" do
     @calc.compute(es(:str_cat)).should == ev(:str_cat)
   end
+
+  it "should not allow concatenating numbers with strings" do
+    lambda {
+      @calc.compute("1 + a")
+    }.should raise_error
+  end
   
   it "should add" do
     @calc.compute(es(:add)).should == ev(:add)
