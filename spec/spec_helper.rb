@@ -69,23 +69,29 @@ module EprimeTestHelper
     row = data.add_row
     row['stim_time'] = '3188'
     row['run_start'] = '2400'
+    row['fix_time'] = '2803'
     row = data.add_row
     row['stim_time'] = '4515'
     row['run_start'] = '2400'
+    row['fix_time'] = '3910'
     row['sparse'] = '20'
     row = data.add_row
     row['stim_time'] = '6515'
     row['run_start'] = '2400'
+    row['fix_time'] = '6096'
     row = data.add_row
     row['stim_time'] = '8115'
     row['run_start'] = '2400'
+    row['fix_time'] = '7777'
     row['sparse'] = '50'
     row = data.add_row
     row['stim_time'] = '9815'
     row['run_start'] = '2400'
+    row['fix_time'] = '9414'
     row = data.add_row
     row['stim_time'] = '12515'
     row['run_start'] = '2800'
+    row['fix_time'] = '12014'
     return data
   end
   
