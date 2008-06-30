@@ -18,6 +18,10 @@ module Eprime
       @filter = filter
     end
     
+    def to_eprime_data
+      Eprime::Data.new().merge!(self)
+    end
+    
     def each
       @data.each do |row|
         yield row if match?(row)

@@ -79,6 +79,12 @@ module Eprime
       return self
     end
     
+    def dup
+      Eprime::Data.new().merge!(self)
+    end
+    
+    alias :to_eprime_data :dup
+    
     # We mostly delegate to our rows array
     def method_missing(method, *args, &block)
       @rows.send method, *args, &block

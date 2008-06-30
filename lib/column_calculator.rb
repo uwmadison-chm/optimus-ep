@@ -37,6 +37,10 @@ module Eprime
       end
     end
     
+    def to_eprime_data
+      Eprime::Data.new().merge!(self)
+    end
+    
     def data=(data)
       @data = data
       
