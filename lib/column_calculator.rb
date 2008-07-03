@@ -35,6 +35,7 @@ module Eprime
       COLUMN_TYPES.each do |type|
         instance_variable_set("@#{type}", [])
       end
+      @sorter = ComputedColumn.new('sorter', Expression.new('1'))
     end
     
     def to_eprime_data
@@ -88,6 +89,15 @@ module Eprime
       set_columns!
     end
     
+    def sort_expression=(expr)
+      @sorter = ComputedColumn.new('sorter', Expression.new(expr))
+      @computed = false
+    end
+    
+    def sort_expression
+      @sorter.to_s
+    end
+    
     def each
       @data.each_index do |row_index|
         yield self[row_index]
@@ -129,18 +139,29 @@ module Eprime
     def self.make_calculator
       @@calculator = ::Eprime::Calculator.new
     end
+    # And the class is instantiated NOW!
     make_calculator
     
+    # Run through and compute all data in the set. We need to go in order,
+    # because copydown and counter columns depend on the values of previous
+    # rows.
     def compute_data!
       @rows = []
       @data.each_index do |row_index|
         row = Row.new(self, @data[row_index])
+        # Loop over each column type -- it's still (slighyly) important that
+        # we go over each column type specifically. When counter columns
+        # work better, we can rearchitect this a bit.
         COLUMN_TYPES.each do |type|
           ar = instance_variable_get("@#{type}")
           ar.each do |col|
             row.compute(col.name)
           end
         end
+        # Set the sort column -- run it as compute_without_check;
+        # compute() would check the row's ordinary values for a 
+        # 'sorter' column and fail.
+        row.sort_value = @sorter.compute_without_check(row).to_f
         @rows << row
       end
       @computed = true
@@ -192,6 +213,10 @@ module Eprime
       def compute(row, path = [])
         return super(row) if super(row)
         
+        return compute_without_check(row, path)
+      end
+      
+      def compute_without_check(row, path = [])
         compute_str = @expression.to_s
         if path.include?(@name) 
           raise ComputationError.new("#{compute_str} contains a loop with #{@name} -- can't compute")
@@ -208,6 +233,7 @@ module Eprime
         end
         return ::Eprime::ColumnCalculator.compute(compute_str)
       end
+      
     end
     
     class CounterColumn < Column
@@ -248,6 +274,7 @@ module Eprime
     
     class Row
       attr_reader :computed_data
+      attr_accessor :sort_value
       
       def initialize(parent, rowdata)
         @parent = parent
@@ -258,6 +285,7 @@ module Eprime
           index = @parent.column_index(dcol_name)
           @computed_data[index] = rowdata[dcol_name]
         end
+        @sort_value = 1
       end
       
       def [](col_id)
@@ -282,9 +310,12 @@ module Eprime
         return @computed_data[index]
       end
       
-      private
+      def <=>(other_row)
+        @sort_value <=> other_row.sort_value
+      end
       
     end
+    
     
     class Expression
       attr_reader :columns

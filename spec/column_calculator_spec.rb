@@ -248,6 +248,32 @@ describe Eprime::ColumnCalculator do
     
   end
   
+  describe "(with sort column)" do
+    it "should sort normally by an increasing column" do
+      @calc.sort_expression = '{stim_time}'
+      @calc.sort.each_index do |row_index|
+        @calc[row_index]['stim_time'].should == @edata[row_index]['stim_time']
+      end
+    end
+    
+    it "should sort in reverse when negating increasing column" do
+      flipped = @edata.sort_by { |row| (row['stim_time'].to_i*-1)}
+      @calc.sort_expression = '-{stim_time}'
+      sorted = @calc.sort
+      sorted.each_index do |row_index|
+        sorted[row_index]['stim_time'].should == flipped[row_index]['stim_time']
+      end
+    end
+    
+    it "should maintain sort order when becoming eprime data" do
+      @calc.sort_expression = '{stim_time}'
+      ed = @calc.to_eprime_data
+      @calc.to_a.each_index do |i|
+        ed[i].sort_value.should == @calc[i].sort_value
+      end
+    end
+  end
+  
   describe "(with copydown columns)" do
     before :each do
       @calc.copydown_column 'sparse_copy', 'sparse'

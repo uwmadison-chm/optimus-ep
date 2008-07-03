@@ -74,6 +74,7 @@ module Eprime
           source.columns.each do |col|
             r[col] = row[col]
           end
+          r.sort_value = row.sort_value
         end
       end
       return self
@@ -121,9 +122,13 @@ module Eprime
     end
     
     class Row
+      attr_accessor :sort_value
+      
       def initialize(parent)
         @data = []
         @parent = parent
+        # Ensure it's comparable
+        @sort_value = 1
       end
       
       def [](index)
@@ -140,6 +145,10 @@ module Eprime
           raise IndexError.new("Column #{num_index} does not exist")
         end
         @data[num_index] = value
+      end
+      
+      def <=>(other)
+        @sort_value <=> other.sort_value
       end
       
       def columns
