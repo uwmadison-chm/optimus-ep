@@ -71,7 +71,7 @@ module Eprime
       datasets.each do |source|
         source.each do |row|
           r = self.add_row
-          source.columns.each do |col|
+          row.columns.each do |col|
             r[col] = row[col]
           end
           r.sort_value = row.sort_value

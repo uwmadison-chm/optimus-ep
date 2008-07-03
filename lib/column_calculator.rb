@@ -27,7 +27,7 @@ module Eprime
     COLUMN_TYPES = %w(data_cols computed_cols copydown_cols counter_cols)
     include Enumerable
     
-    def initialize
+    def initialize()
       @columns = []
       @columns_intern = []
       @column_indexes = {}
@@ -308,6 +308,10 @@ module Eprime
       
       def find_column(column_name)
         @parent.column(column_name)
+      end
+      
+      def columns
+        @parent.columns
       end
       
       
