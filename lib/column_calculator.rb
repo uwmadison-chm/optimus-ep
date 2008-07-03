@@ -35,9 +35,11 @@ module Eprime
       COLUMN_TYPES.each do |type|
         instance_variable_set("@#{type}", [])
       end
+      # The name 'sorter' is never used; it's just an arbitrary placeholder
       @sorter = ComputedColumn.new('sorter', Expression.new('1'))
     end
     
+    # Makes this into a static Eprime::Data object
     def to_eprime_data
       Eprime::Data.new().merge!(self)
     end
@@ -90,6 +92,7 @@ module Eprime
     end
     
     def sort_expression=(expr)
+      # The name 'sorter' is utterly arbitrary and never used
       @sorter = ComputedColumn.new('sorter', Expression.new(expr))
       @computed = false
     end
@@ -161,7 +164,15 @@ module Eprime
         # Set the sort column -- run it as compute_without_check;
         # compute() would check the row's ordinary values for a 
         # 'sorter' column and fail.
-        row.sort_value = @sorter.compute_without_check(row).to_f
+        sv = @sorter.compute_without_check(row)
+        # make it a float, so we don't need to
+        # sort on strings like "-31" (which doesn't work)
+        begin
+          sv = Kernel.Float(sv)
+        rescue ArgumentError
+          # If this fails, it's OK -- we just won't convert.
+        end
+        row.sort_value = sv
         @rows << row
       end
       @computed = true
