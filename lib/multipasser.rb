@@ -96,6 +96,5 @@ module Eprime
       @all_data = Eprime::Data.new.merge(@all_data.sort)
       @computed = true
     end
-    
   end
 end
