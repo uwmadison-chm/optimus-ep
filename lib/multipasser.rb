@@ -29,7 +29,7 @@ module Eprime
       def initialize(sort_expression = "1", row_filter = lambda{|r| true}, computed_columns = [])
         @sort_expression = sort_expression
         @row_filter = row_filter
-        @computed_columns = []
+        @computed_columns = computed_columns
       end
       
       def computed_column(name, expression)
@@ -45,8 +45,14 @@ module Eprime
       @computed = false
     end
     
+    def columns
+      compute! unless @computed
+      @all_data.columns.dup
+    end
+    
     def data=(data)
       @data = data
+      @computed = false
     end
     
     def each
@@ -59,6 +65,7 @@ module Eprime
     def add_pass(*args)
       p = Pass.new(*args)
       @passes << p and return p
+      @computed = false
     end
     
     def [](index)
@@ -84,17 +91,10 @@ module Eprime
           comp_data.computed_column(name, expr)
         end
         filtered = RowFilter.new(comp_data, pass.row_filter)
-        @all_data.merge!(comp_data)
+        @all_data.merge!(filtered)
       end
       @all_data = Eprime::Data.new.merge(@all_data.sort)
-      
-      # 1: Create an empty Eprime::Data object @all_data
-      # 2: For each pass:
-      #  a: Duplicate @data
-      #  b: Create a ColumnCalculator object, 
-      #  c: Apply a row filter to it
-      #  d: Merge the filtered data into @all_data
-      # 3: Sort @acc
+      @computed = true
     end
     
   end

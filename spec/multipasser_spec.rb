@@ -74,6 +74,15 @@ describe Eprime::Multipasser do
         @mpass[i]['presented_time'].to_s.should == ps[i]['presented_time'].to_s
       end
     end
+    
+    it "should work with multiple arguments in constructor" do
+      pass = @mpass.add_pass(
+        "{fix_time}", 
+        lambda {|r| !r['sparse'].to_s.empty?}, 
+        [['silly', '{fix_time} - {stim_time}']])
+      @mpass.columns.should include('silly')
+      @mpass.to_a.size.should == @data.find_all {|r| !r['sparse'].to_s.empty?}.size
+    end
   end
   
     
