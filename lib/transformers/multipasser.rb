@@ -18,8 +18,8 @@
 # fixation          100
 # stimulus          130
 
-require 'column_calculator'
-require 'row_filter'
+require 'transformers/column_calculator'
+require 'transformers/row_filter'
 
 module Eprime
   module Transformers
