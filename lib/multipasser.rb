@@ -63,9 +63,13 @@ module Eprime
     end
     
     def add_pass(*args)
-      p = Pass.new(*args)
-      @passes << p and return p
       @computed = false
+      if args[0].instance_of? Pass
+        p = args[0]
+      else
+        p = Pass.new(*args)
+      end
+      @passes << p and return p
     end
     
     def [](index)
