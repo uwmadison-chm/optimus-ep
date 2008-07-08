@@ -10,7 +10,7 @@ require 'rubygems'
 Gem::Specification.new do |s|
   s.name = 'optimus-ep'
   s.rubyforge_project = 'optimus-ep'
-  s.version = '0.5'
+  s.version = '0.6'
   s.platform = Gem::Platform::RUBY
   s.author = "Nathan Vack"
   s.email = "njvack@wisc.edu"
