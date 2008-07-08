@@ -9,7 +9,7 @@
 
 require File.join(File.dirname(__FILE__),'..','spec_helper')
 require File.join(File.dirname(__FILE__),'../../lib/eprime')
-require File.join(File.dirname(__FILE__),'../../lib/transformers/basic_transformer')
+require File.join('transformers/basic_transformer')
 include EprimeTestHelper
 include Eprime::Transformers
 

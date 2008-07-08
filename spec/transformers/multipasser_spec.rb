@@ -5,15 +5,15 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
-require 'multipasser'
+require File.join(File.dirname(__FILE__),'../spec_helper')
+require File.join(File.dirname(__FILE__), '../../lib/eprime')
+require 'transformers/multipasser'
 
 include EprimeTestHelper
 
-describe Eprime::Multipasser do
+describe Eprime::Transformers::Multipasser do
   before :each do
-    @mpass = Eprime::Multipasser.new(mock_edata)
+    @mpass = Multipasser.new(mock_edata)
   end
   
   it "should iterate normally before adding any passes" do
@@ -34,7 +34,7 @@ describe Eprime::Multipasser do
   describe "with a sort_by" do
     before :each do
       @data = mock_edata
-      @mpass = Eprime::Multipasser.new(@data)
+      @mpass = Multipasser.new(@data)
     end
     
     it "should sort normally by an ascending column" do

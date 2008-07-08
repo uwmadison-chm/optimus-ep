@@ -12,9 +12,9 @@
 # RowFilter, and Multipasser classes
 
 require 'eprime'
-require 'column_calculator'
-require 'row_filter'
-require 'multipasser'
+require 'transformers/column_calculator'
+require 'transformers/row_filter'
+require 'transformers/multipasser'
 
 module Eprime
   module Transformers
@@ -60,7 +60,7 @@ module Eprime
       
       def add_pass(*args)
         reset!
-        p = Eprime::Multipasser::Pass.new(*args)
+        p = Multipasser::Pass.new(*args)
         yield p if block_given?
         @passes << p
         return p

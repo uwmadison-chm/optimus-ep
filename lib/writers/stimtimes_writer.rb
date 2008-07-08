@@ -9,11 +9,13 @@
 # architect it, yet.
 
 require 'eprime'
-require 'column_calculator'
-require 'row_filter'
+require 'transformers/column_calculator'
+require 'transformers/row_filter'
 
 module Eprime
   class StimtimesWriter
+    include Transformers
+    
     @@computed_columns = []
     @@counter_columns = []
     @@copydown_columns = []
@@ -30,7 +32,7 @@ module Eprime
           edata.merge!(reader.eprime_data)
         end
         
-        @calc = Eprime::ColumnCalculator.new
+        @calc = ColumnCalculator.new
         @calc.data = edata
         @@computed_columns.each do |coldata|
           @calc.computed_column *coldata
@@ -54,7 +56,7 @@ module Eprime
 
     def output_file(filename, filter, output_column)
       File.open(filename, 'w') do |file|
-        filtered = Eprime::RowFilter.new(@calc, filter)
+        filtered = RowFilter.new(@calc, filter)
         
         1.upto(@@runs) do |run|            
           run_rows = filtered.find_all {|row| row[@@run_column].to_s == run.to_s}.to_a

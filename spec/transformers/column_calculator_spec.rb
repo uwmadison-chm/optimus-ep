@@ -5,22 +5,22 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
+require File.join(File.dirname(__FILE__),'../spec_helper')
+require File.join(File.dirname(__FILE__), '../../lib/eprime')
 
-require 'column_calculator'
+require 'transformers/column_calculator'
 
 include EprimeTestHelper
 
 NEW_COLUMN = 'NEW_COLUMN'
 
-shared_examples_for "Eprime::ColumnCalculator with edata" do
+shared_examples_for "Eprime::Transformers::ColumnCalculator with edata" do
   it "should have the proper size" do
     @calc.size.should == @edata.size
   end
   
   it "should allow accessing rows" do
-    @calc[0].should be_an_instance_of(Eprime::ColumnCalculator::Row)
+    @calc[0].should be_an_instance_of(Eprime::Transformers::ColumnCalculator::Row)
   end
   
   it "should return data" do
@@ -115,15 +115,15 @@ shared_examples_for "Eprime::ColumnCalculator with edata" do
   it "should raise when adding computed column with existing column name" do
     lambda {
       @calc.computed_column @edata.columns[0], '1'
-    }.should raise_error(Eprime::ColumnCalculator::ComputationError)
+    }.should raise_error(Eprime::Transformers::ColumnCalculator::ComputationError)
   end
   
 end
 
-describe Eprime::ColumnCalculator do
+describe Eprime::Transformers::ColumnCalculator do
   before :each do
     @edata = mock_edata
-    @calc = Eprime::ColumnCalculator.new
+    @calc = Eprime::Transformers::ColumnCalculator.new
     @calc.data = @edata
   end
   
@@ -132,7 +132,7 @@ describe Eprime::ColumnCalculator do
       @calc.columns.should == @edata.columns
     end
     
-    it_should_behave_like "Eprime::ColumnCalculator with edata"
+    it_should_behave_like "Eprime::Transformers::ColumnCalculator with edata"
   end
   
   describe "(statically computing columns)" do
@@ -234,7 +234,7 @@ describe Eprime::ColumnCalculator do
       @calc.computed_column "loop4", "{loop3}"
       lambda {
         @calc[0]['loop4']
-      }.should raise_error(Eprime::ColumnCalculator::ComputationError)
+      }.should raise_error(Eprime::Transformers::ColumnCalculator::ComputationError)
     end
     
     it "should compute columns when there are two paths to a node" do
@@ -367,10 +367,10 @@ describe Eprime::ColumnCalculator do
   end
 end
 
-describe Eprime::ColumnCalculator::Expression do
+describe Eprime::Transformers::ColumnCalculator::Expression do
   before :each do
     @expr_str = "({stim_time}-{run_start}) / 1000"
-    @expr = Eprime::ColumnCalculator::Expression.new(@expr_str)
+    @expr = Eprime::Transformers::ColumnCalculator::Expression.new(@expr_str)
   end
   
   it "should find two columns" do
