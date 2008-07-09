@@ -45,6 +45,3 @@ spec/transformers/column_calculator_spec.rb
 spec/transformers/multipasser_spec.rb
 spec/transformers/row_filter_spec.rb
 spec/writers/stimtimes_writer_spec.rb
-tasks/deployment.rake
-tasks/environment.rake
-tasks/website.rake

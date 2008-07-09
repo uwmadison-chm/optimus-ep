@@ -31,9 +31,9 @@ Run 'rubyforge setup' to prepare your env for access to Rubyforge
 end
 
 
-#REV = nil
+REV = nil
 # UNCOMMENT IF REQUIRED:
-REV = YAML.load(`svn info`)['Revision']
+#REV = YAML.load(`svn info`)['Revision']
 VERS = Eprime::VERSION::STRING + (REV ? ".#{REV}" : "")
 RDOC_OPTS = ['--quiet', '--title', 'optimus-ep documentation',
     "--opname", "index.html",
