@@ -10,6 +10,7 @@
     datasets: column calculation, row filtering, and multipass
   * Moved ColumnCalculator, RowFilter, and Multipasser into a Transformers
     module
+  * Support release via hoe / rubygems
 
 == 0.5.0 6/26/2008
 
