@@ -1,0 +1,15 @@
+== 0.5.5
+* New features:
+  * Supports making multiple passes through data, to allow extracting multiple
+    stimuli that occur on the same row
+* Architectural changes:
+  * Created a BasicTransformer that performs all of the basic operations to
+    datasets: column calculation, row filtering, and multipass
+  * Moved ColumnCalculator, RowFilter, and Multipasser into a Transformers
+    module
+
+== 0.5
+
+* First public gem release
+  * Supports converting general Eprime files into tab-delimited files
+  * Supports converting Eprime files into AFNI stim_times files

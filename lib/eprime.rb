@@ -9,6 +9,7 @@
 $: << File.expand_path(File.join(File.dirname(__FILE__), "..", "lib"))
 
 require 'eprime_data'
+require 'version'
 require 'tabfile_writer'
 require 'eprime_reader'
 
