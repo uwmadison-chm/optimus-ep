@@ -80,6 +80,14 @@ module Eprime
       return self
     end
     
+    def sort!(&block)
+      @rows = @rows.sort(&block)
+    end
+    
+    def sort_by!(&block)
+      @rows = @rows.sort_by(&block)
+    end
+    
     def dup
       Eprime::Data.new().merge!(self)
     end
