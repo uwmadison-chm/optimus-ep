@@ -39,6 +39,7 @@ module Eprime
           'offset_column' => offset_column,
           'row_filter' => row_filter
         }
+        @extracted_data = nil
       end
       
       def extracted_data
