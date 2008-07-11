@@ -84,7 +84,7 @@ module Eprime
       opts.on('-o', '--outfile=OUTFILE', String,
         'The name of the file to create. If this',
         'isn\'t specified, print to the standard',
-        "output."
+        "output"
       ) { |val|
         option_hash[:outfile] = val
       }
@@ -92,14 +92,14 @@ module Eprime
   
       opts.on('-c', '--columns=COLUMN_FILE', String, 
         'A tab-separated file containing the columns',
-        "in the order you want your output."
+        "in the order you want your output"
       ) { |val|
         option_hash[:column_file] = val
       }
       opts.separator ""
       
       opts.on('--filter-columns', TrueClass,
-        'Write out only the columns in COLUMN_FILE.',
+        'Write out only the columns in COLUMN_FILE',
         'Requires the use of --columns'
       ) {
         option_hash[:filter_columns] = true
@@ -109,14 +109,14 @@ module Eprime
 
       opts.on('-a', '--add-filename-line', TrueClass,
         'Print the filename as the first line of',
-        "your output, just like E-DataAid."
+        "your output, just like E-DataAid"
       ) { 
         option_hash[:add_filename_line] = true
       }
       opts.separator ""
 
       opts.on('-f', '--force', TrueClass,
-        "Continue processing even there are errors."
+        "Continue processing even there are errors"
       ) {
         option_hash[:force] = true
       }
