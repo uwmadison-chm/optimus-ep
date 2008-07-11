@@ -38,19 +38,35 @@ module Eprime
       end
       
       def build_option_parser
-        @option_hash = {}
+        @options = {}
         op = OptionParser.new
         op.banner = "Usage: extract_timings --template TEMPLATE_FILE [OPTIONS] INPUT_FILES"
         op.separator ''
-        op.on('-t', '--template TEMPLATE_FILE', 
+        op.on('-t', '--template=TEMPLATE_FILE', String,
           'A template containing commands describing',
-          'how to process these files.'
-        ) do |tf|
-          
+          'how to process these files'
+        ) do |template|
+          # FILL ME
         end
         op.separator ''
-        op.on(
-        )
+        op.on('--[no-]column-labels',
+          'Print column lablels in the first row'
+        ) do |label|
+          # FILL ME
+        end
+        op.separator ''
+        op.on('-o', '--outfile=OUTFILE',
+          "The name of the file to save to. If not",
+          "given, print to standard output."
+        ) do |filename|
+          # FILL ME
+        end
+        op.separator ''
+        op.on('-h', '--help',
+          'Print this message'
+        ) do |help|
+          # FILL ME
+        end
       end
       
     end
