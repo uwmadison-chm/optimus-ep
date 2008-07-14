@@ -14,12 +14,12 @@
 
 require File.join(File.dirname(__FILE__),'../spec_helper')
 require File.join(File.dirname(__FILE__), '../../lib/eprime')
-require 'runners/timing_extractor_runner'
+require 'runners/generic_runner'
 include EprimeTestHelper
 
-describe Eprime::Runners::TimingExtractorRunner do
+describe Eprime::Runners::GenericRunner do
   before :each do
-    @txr = Eprime::Runners::TimingExtractorRunner.new
+    @txr = Eprime::Runners::GenericRunner.new
   end
   
   it "should start with stdout in @out" do

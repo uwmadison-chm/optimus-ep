@@ -13,7 +13,7 @@ lib/eprime_reader.rb
 lib/eprimetab_parser.rb
 lib/excel_parser.rb
 lib/log_file_parser.rb
-lib/runners/timing_extractor_runner.rb
+lib/runners/generic_runner.rb
 lib/tabfile_parser.rb
 lib/tabfile_writer.rb
 lib/transformers/basic_transformer.rb
@@ -29,7 +29,7 @@ spec/eprime_reader_spec.rb
 spec/eprimetab_parser_spec.rb
 spec/excel_parser_spec.rb
 spec/log_file_parser_spec.rb
-spec/runners/timing_extractor_runner_spec.rb
+spec/runners/generic_runner_spec.rb
 spec/samples/bad_excel_tsv.txt
 spec/samples/corrupt_log_file.txt
 spec/samples/eprime_tsv.txt

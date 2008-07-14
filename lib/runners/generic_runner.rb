@@ -28,11 +28,13 @@ require 'ostruct'
 
 module Eprime
   module Runners
-    class TimingExtractorRunner
+    class GenericRunner
       include ::Eprime::Transformers
       
       attr_accessor :out, :err
-      def initialize(*args)
+      def initialize(extractor_class, script_name, *args)
+        @extractor_class = extractor_class
+        @script_name = script_name
         @out = STDOUT
         @err = STDERR
         @args = args
@@ -60,7 +62,7 @@ module Eprime
       end
       
       def extract_timings
-        @timing_extractor = TimingExtractor.new(@data)
+        @timing_extractor = @extractor_class.new(@data)
         template_code = ''
         File.open(@options.template_file) { |f| 
           template_code = f.read 
@@ -107,7 +109,7 @@ module Eprime
       end
       
       def usage
-        "#{@op.banner.to_s} \nextract_timings --help for help"
+        "#{@op.banner.to_s} \n#{@script_name} --help for help"
       end
       
       private

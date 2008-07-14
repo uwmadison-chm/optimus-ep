@@ -8,11 +8,14 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require 'rubygems'
+require 'optparse'
 gem 'optimus-ep'
-require 'runners/timing_extractor_runner'
+require 'runners/generic_runner'
+
+script_name = File.basename(__FILE__)
 
 begin
-  txr = Eprime::Runners::TimingExtractorRunner.new(ARGV)
+  txr = Eprime::Runners::GenericRunner.new(Eprime::Transformers::TimingExtractor, script_name, ARGV)
   txr.process!
 rescue ArgumentError => e
   STDERR.puts e.message
