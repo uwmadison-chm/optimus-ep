@@ -20,10 +20,17 @@ module Eprime
     # :write_top_line => true, if you want to include the filename
     #   (if it's a file output stream) as the first line output
     def initialize(eprime_data, outstream, options = {})
+      standard_options = {
+        :write_top_line => false,
+        :columns => nil,
+        :column_labels => true
+      }
+      good_opts = standard_options.merge(options)
       @eprime = eprime_data
       @outstream = outstream
-      @write_top_line = options[:write_top_line]
-      @columns = options[:columns] || @eprime.columns
+      @write_top_line = good_opts[:write_top_line]
+      @columns = good_opts[:columns] || @eprime.columns
+      @column_labels = good_opts[:column_labels]
     end
     
     # Write to the output stream.
@@ -33,7 +40,9 @@ module Eprime
           name = @outstream.respond_to?(:path) ? File.expand_path(@outstream.path.to_s) : ''
           tsv << [name]
         end
-        tsv << @columns
+        if @column_labels
+          tsv << @columns
+        end
         @eprime.each do |row|
           vals = @columns.map { |col_name| row[col_name] }
           tsv << vals

@@ -88,4 +88,17 @@ describe "Eprime::TabfileWriter" do
       lambda { @writer.write }.should raise_error(IndexError)
     end
   end
+  
+  describe "with column_labels set to false" do
+    before :each do
+      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s, {:column_labels => false})
+      @writer.write
+      @out_s.rewind
+    end
+    
+    it "should not write a line with column labels" do
+      @out_s.readlines.size.should == @eprime_data.size
+    end
+    
+  end
 end
