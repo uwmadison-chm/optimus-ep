@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+# Part of the Optimus package for managing E-Prime data
+# 
+# Copyright (C) 2008 Board of Regents of the University of Wisconsin System
+# 
+# Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
+# Imaging and Behavior, University of Wisconsin - Madison
+
+require 'rubygems'
+gem 'optimus-ep'
+require 'runners/timing_extractor_runner'
+
+begin
+  txr = Eprime::Runners::TimingExtractorRunner.new(ARGV)
+  txr.process!
+rescue ArgumentError => e
+  STDERR.puts e.message
+  exit 1
+rescue Exception => e
+  STDERR.puts e.message
+  exit 2
+end
