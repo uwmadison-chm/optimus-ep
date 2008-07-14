@@ -1,3 +1,11 @@
+== 0.6.0 7/14/2008
+* New features:
+  * Added extract_timings, a script to pull stimulus timing data from eprime
+    files.
+  * Added a GenericRunner -- a class that greatly eases end-to-end
+    transformation of eprime data. See extract_timings for an example of
+    its use.
+
 == 0.5.5 7/09/2008
 * New features:
   * Supports making multiple passes through data, to allow extracting multiple
