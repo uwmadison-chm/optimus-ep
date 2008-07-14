@@ -58,6 +58,8 @@ module Eprime
         @row_filter = filter
       end
       
+      alias :row_filter :row_filter=
+      
       def add_pass(*args)
         reset!
         p = Multipasser::Pass.new(*args)
