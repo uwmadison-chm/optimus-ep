@@ -15,9 +15,6 @@
 #
 # This class should handle argument processing, file I/O, and such.
 
-# TODO: Think up a clever way to make this handle arbitrary transformers
-# Probably this is possible by passing the class of the transformer to
-# this runner, and instance_eval()'ing the template file in its presence.
 
 require 'eprime'
 require 'eprime_reader'
@@ -32,9 +29,11 @@ module Eprime
       include ::Eprime::Transformers
       
       attr_accessor :out, :err
-      def initialize(extractor_class, script_name, *args)
+      def initialize(extractor_class, *args)
         @extractor_class = extractor_class
-        @script_name = script_name
+        # caller returns an array of 'filename:line' -- the last element
+        # should contain the name of the script that started this process
+        @script_name = File.basename(caller.last.split(':').first)
         @out = STDOUT
         @err = STDERR
         @args = args

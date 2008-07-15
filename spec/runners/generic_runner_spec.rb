@@ -19,7 +19,7 @@ include EprimeTestHelper
 
 describe Eprime::Runners::GenericRunner do
   before :each do
-    @txr = Eprime::Runners::GenericRunner.new
+    @txr = Eprime::Runners::GenericRunner.new(Eprime::Transformers::BasicTransformer)
   end
   
   it "should start with stdout in @out" do

@@ -12,10 +12,8 @@ require 'optparse'
 gem 'optimus-ep'
 require 'runners/generic_runner'
 
-script_name = File.basename(__FILE__)
-
 begin
-  txr = Eprime::Runners::GenericRunner.new(Eprime::Transformers::TimingExtractor, script_name, ARGV)
+  txr = Eprime::Runners::GenericRunner.new(Eprime::Transformers::TimingExtractor, ARGV)
   txr.process!
 rescue ArgumentError => e
   STDERR.puts e.message
