@@ -88,7 +88,6 @@ module Eprime
           # computed columns, filter it, and then merge it into the complete
           # dataset.
           cur_data = @data.to_eprime_data 
-          #puts "Cur data columns is all #{cur_data.columns} and size is #{cur_data.size}"
           comp_data = ColumnCalculator.new
           comp_data.data = cur_data
           comp_data.sort_expression = pass.sort_expression

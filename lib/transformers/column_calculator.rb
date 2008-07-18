@@ -53,7 +53,6 @@ module Eprime
         end
         @data = data
         @data_cols = []
-        #puts "@data.columns is #{@data.columns}"
         @data.columns.each do |col_name|
           @data_cols << DataColumn.new(col_name, @data)
         end
@@ -139,7 +138,6 @@ module Eprime
         @column_indexes = {}
         COLUMN_TYPES.each do |type|
           ar = instance_variable_get("@#{type}")
-          #puts "#{type} contains #{ar.join(' ')}"
           ar.each do |col|
             add_column(col)
           end
@@ -312,7 +310,6 @@ module Eprime
             begin
               ci = values[index]
             rescue Exception => e
-              #puts "index is #{index}, dcol_name is #{dcol_name}, @parent.columns is #{@parent.columns}"
               raise e
             end
             @values[index] = rowdata[dcol_name]
