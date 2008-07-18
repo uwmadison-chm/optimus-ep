@@ -43,28 +43,20 @@ module Eprime
       def initialize(data = nil)
         @data = data
         @passes = []
-        @computed = false
+        reset!
       end
     
       def columns
-        compute! unless @computed
-        @all_data.columns.dup
+        computed.columns
       end
     
       def data=(data)
         @data = data
-        @computed = false
-      end
-    
-      def each
-        compute! unless @computed
-        @all_data.each do |row|
-          yield row
-        end
+        reset!
       end
     
       def add_pass(*args)
-        @computed = false
+        @computed = nil
         if args[0].instance_of? Pass
           p = args[0]
         else
@@ -73,16 +65,23 @@ module Eprime
         @passes << p and return p
       end
     
+      def each(&block)
+        computed.each(&block)
+      end
+    
       def [](index)
-        compute! unless @computed
-        return @all_data[index]
+        computed[index]
       end
     
       private
-      def compute!
-        @all_data = Eprime::Data.new
+      def computed
+        return @computed if @computed
+        if @passes.empty?
+          @computed = @data
+          return @computed
+        end
+        @computed = Eprime::Data.new
         # Just add a simple pass if we don't have any...
-        add_pass if @passes.empty?
         @passes.each do |pass|
           # We want to duplicate the data, add a sort expression to it, add
           # computed columns, filter it, and then merge it into the complete
@@ -96,10 +95,14 @@ module Eprime
             comp_data.computed_column(name, expr)
           end
           filtered = RowFilter.new(comp_data, pass.row_filter)
-          @all_data.merge!(filtered)
+          @computed.merge!(filtered)
         end
-        @all_data.sort!
-        @computed = true
+        @computed.sort!
+        return @computed
+      end
+      
+      def reset!
+        @computed = nil
       end
     end
   end
