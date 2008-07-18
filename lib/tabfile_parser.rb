@@ -44,9 +44,7 @@ module Eprime
           if col_data.size != expected_size
             raise DamagedFileError.new("In #{@file.path}, line #{current_line} should have #{expected_size} columns but had #{col_data.size}.")
           end
-          col_data.each_index do |i|
-            row[i] = col_data[i]
-          end
+          row.values = col_data
         end
         return data
       end
