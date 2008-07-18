@@ -32,6 +32,7 @@ module Eprime
         @columns = []
         @columns_intern = []
         @column_indexes = {}
+        @computed = nil
         @rows = []
         COLUMN_TYPES.each do |type|
           instance_variable_set("@#{type}", [])
@@ -42,13 +43,17 @@ module Eprime
     
       # Makes this into a static Eprime::Data object
       def to_eprime_data
-        Eprime::Data.new().merge!(self)
+        computed
       end
     
       def data=(data)
+        unless data.kind_of?(Eprime::Data)
+
+          raise Exception.new("Should be Eprime::Data, is actually #{data.class} -- #{data.kind_of?(Eprime::Data)}")
+        end
         @data = data
-      
         @data_cols = []
+        #puts "@data.columns is #{@data.columns}"
         @data.columns.each do |col_name|
           @data_cols << DataColumn.new(col_name, @data)
         end
@@ -56,14 +61,10 @@ module Eprime
       end
     
       def [](index)
-        compute_data! unless @computed
-        return @rows[index]
+        computed[index]
       end
     
       def column_index(col_id)
-        if col_id.is_a? Fixnum
-          return (col_id >= 0 and col_id < @columns.size) ? col_id : nil
-        end
         return @column_indexes[col_id]
       end
     
@@ -72,9 +73,13 @@ module Eprime
         raise IndexError.new("#{col_id} does not exist") if index.nil?
         return @columns_intern[index]
       end
-    
+      
       def size
         @data.size
+      end
+      
+      def columns
+        @columns.dup
       end
     
       def computed_column(name, expression)
@@ -95,18 +100,15 @@ module Eprime
       def sort_expression=(expr)
         # The name 'sorter' is utterly arbitrary and never used
         @sorter = ComputedColumn.new('sorter', Expression.new(expr))
-        @computed = false
+        @computed = nil
       end
     
       def sort_expression
         @sorter.to_s
       end
     
-      def each
-        @data.each_index do |row_index|
-          yield self[row_index]
-        end
-        @rows
+      def each(&block)
+        computed.each(&block)
       end
     
       def self.compute(numeric_expression)
@@ -114,31 +116,37 @@ module Eprime
       end
     
       private
-    
+      
+      def computed
+        @computed || compute_data!
+      end
+      
       def add_column(column)
         # Raise an error if the column already exists
         if @column_indexes[column.name]
           raise ComputationError.new("#{column.name} already exists!")
         end
         # Save the index
+        @column_indexes[@columns_intern.size] = @columns_intern.size
         @column_indexes[column.name] = @columns_intern.size
         @columns_intern << column
         @columns << column.name
       end
-    
+      
       def set_columns!
         @columns = []
         @columns_intern = []
         @column_indexes = {}
         COLUMN_TYPES.each do |type|
           ar = instance_variable_get("@#{type}")
+          #puts "#{type} contains #{ar.join(' ')}"
           ar.each do |col|
             add_column(col)
           end
         end
-        @computed = false
+        @computed = nil
       end
-    
+      
       # Creates the infix calculator -- called at class instantiation time
       def self.make_calculator
         @@calculator = ::Eprime::Calculator.new
@@ -150,9 +158,10 @@ module Eprime
       # because copydown and counter columns depend on the values of previous
       # rows.
       def compute_data!
-        @rows = []
-        @data.each_index do |row_index|
-          row = Row.new(self, @data[row_index])
+        @computed = Eprime::Data.new(columns)
+        @data.each_index do |i|
+          #row = @computed.add_row
+          row = Row.new(self, @data[i])
           # Loop over each column type -- it's still (slighyly) important that
           # we go over each column type specifically. When counter columns
           # work better, we can rearchitect this a bit.
@@ -173,12 +182,16 @@ module Eprime
           rescue ArgumentError
             # If this fails, it's OK -- we just won't convert.
           end
-          row.sort_value = sv
-          @rows << row
+          new_row = @computed.add_row
+          new_row.sort_value = sv
+          row.columns.each do |c|
+            new_row[c] = row[c]
+          end
+          #@computed.add_row_values(row.values, sv)
         end
-        @computed = true
+        @computed
       end
-    
+      
       class Column
         attr_accessor :name
       
@@ -285,17 +298,24 @@ module Eprime
       end
     
       class Row
-        attr_reader :computed_data
+        attr_reader :values
         attr_accessor :sort_value
       
         def initialize(parent, rowdata)
           @parent = parent
           @rowdata = rowdata
-          @computed_data = []
-          # Add all the data columns to computed_data
+          @values = []
+          # Add all the data columns to @values
           rowdata.columns.each do |dcol_name|
             index = @parent.column_index(dcol_name)
-            @computed_data[index] = rowdata[dcol_name]
+            rd = rowdata[dcol_name]
+            begin
+              ci = values[index]
+            rescue Exception => e
+              #puts "index is #{index}, dcol_name is #{dcol_name}, @parent.columns is #{@parent.columns}"
+              raise e
+            end
+            @values[index] = rowdata[dcol_name]
           end
           @sort_value = 1
         end
@@ -304,7 +324,7 @@ module Eprime
           if @parent.column_index(col_id).nil?
             raise IndexError.new("#{col_id} does not exist")
           end
-          return @computed_data[@parent.column_index(col_id)]
+          return @values[@parent.column_index(col_id)]
         end
       
         def find_column(column_name)
@@ -322,14 +342,14 @@ module Eprime
         
           index = @parent.column_index(col_name)
           col = @parent.column(col_name)
-          @computed_data[index] = col.compute(self)
-          return @computed_data[index]
+          val = col.compute(self)
+          @values[index] = val
+          return val
         end
       
         def <=>(other_row)
           @sort_value <=> other_row.sort_value
         end
-      
       end
     
     

@@ -28,6 +28,10 @@ module Eprime
           yield row if match?(row)
         end
       end
+      
+      def columns
+        @data.columns
+      end
     
       def match?(row)
         if @filter.is_a? Proc

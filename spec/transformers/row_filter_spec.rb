@@ -29,4 +29,5 @@ describe Eprime::Transformers::RowFilter do
       row['run_start'].should == '2400'
     end
   end
+  
 end

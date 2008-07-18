@@ -103,4 +103,10 @@ module EprimeTestHelper
     CONST_EXPRS[sym][1].call.to_s
   end
   
+  def time
+    t1 = Time.now.to_f
+    yield
+    return Time.now.to_f - t1
+  end
+  
 end

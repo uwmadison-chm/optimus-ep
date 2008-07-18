@@ -5,13 +5,6 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-# A runner to take eprime data files, chew them through a pesudo-templater, 
-# and produce delicious files for importing into other packages. They'll look
-# like:
-#
-# presented     onset     offset
-# stim1         5992      6493
-# stim2         7294      7981
 #
 # This class should handle argument processing, file I/O, and such.
 
@@ -31,7 +24,7 @@ module Eprime
       attr_accessor :out, :err
       def initialize(extractor_class, *args)
         @extractor_class = extractor_class
-        # caller returns an array of 'filename:line' -- the last element
+        # caller() returns an array of 'filename:line' -- the last element
         # should contain the name of the script that started this process
         @script_name = File.basename(caller.last.split(':').first)
         @out = STDOUT

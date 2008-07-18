@@ -9,6 +9,7 @@ require File.join(File.dirname(__FILE__),'../spec_helper')
 require File.join(File.dirname(__FILE__), '../../lib/eprime')
 require 'transformers/multipasser'
 
+include Eprime::Transformers
 include EprimeTestHelper
 
 describe Eprime::Transformers::Multipasser do

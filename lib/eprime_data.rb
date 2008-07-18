@@ -62,7 +62,9 @@ module Eprime
     # Returns a new Eprime::Data object containing the data from this
     # and all other data sets
     def merge(*datasets)
-      d = Eprime::Data.new
+      #all_cols = datasets.map { |d| d.columns }
+      #cols = all_cols.flatten.uniq
+      d = Eprime::Data.new()
       return d.merge!(self, *datasets)
     end
     
@@ -99,18 +101,19 @@ module Eprime
       @rows.send method, *args, &block
     end
     
-    def add_row
+    def add_row()
+      # THIS IS NOT ACCEPTABLE, FIX IT TOMORROW.
       row = Row.new(self)
       @rows << row
       return row
     end
     
+    #def add_row_values(values, sort_value = 1)
+    #  r = Row.new(self, values, sort_value)
+    #end
+    
     def find_column_index(col_id)
-      if col_id.is_a? Fixnum
-        return (col_id < @columns.size) ? col_id : nil
-      end
-      # Short-circuit this 
-      @column_hash[col_id] if @column_hash[col_id]
+      @column_hash[col_id]
     end
     
     def find_or_add_column_index(col_id)
@@ -120,9 +123,10 @@ module Eprime
       # indexes.
       return index_id if index_id or col_id.is_a?(Fixnum)
       # In this case, we're adding a column...
+      index = @columns.size
       @columns << col_id
-      index = @columns.length - 1
       @column_hash[col_id] = index
+      @column_hash[index] = index
       if @columns_set_in_initialize and not @options[:ignore_warnings]
         raise ColumnAddedWarning.new("Error: Added column #{col_id} after specifying columns at init", index)
       end
@@ -132,11 +136,11 @@ module Eprime
     class Row
       attr_accessor :sort_value
       
-      def initialize(parent)
-        @data = []
+      def initialize(parent, data = [], sort_value = 1)
         @parent = parent
+        @data = data
         # Ensure it's comparable
-        @sort_value = 1
+        @sort_value = sort_value
       end
       
       def [](index)
@@ -169,6 +173,10 @@ module Eprime
           vals[i] = @data[i]
         end
         return vals
+      end
+      
+      def dup
+        
       end
       
     end

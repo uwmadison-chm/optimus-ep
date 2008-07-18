@@ -45,6 +45,10 @@ shared_examples_for "Eprime::Data with one row" do
     @row[index] = "bitten"
     @row[index].should == "bitten"
   end
+  
+  it "should not lose columns when duplicating" do
+    @data.columns.should == @data.dup.columns
+  end
 
   it "should raise when setting out-of-bound column value" do
     lambda {

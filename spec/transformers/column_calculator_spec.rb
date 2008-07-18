@@ -9,6 +9,7 @@ require File.join(File.dirname(__FILE__),'../spec_helper')
 require File.join(File.dirname(__FILE__), '../../lib/eprime')
 
 require 'transformers/column_calculator'
+require 'transformers/row_filter'
 
 include EprimeTestHelper
 
@@ -19,8 +20,12 @@ shared_examples_for "Eprime::Transformers::ColumnCalculator with edata" do
     @calc.size.should == @edata.size
   end
   
+  it "should not be nil" do
+    @calc[0].should_not be_nil
+  end
+  
   it "should allow accessing rows" do
-    @calc[0].should be_an_instance_of(Eprime::Transformers::ColumnCalculator::Row)
+    @calc[0].should be_a_kind_of(Eprime::Data::Row)
   end
   
   it "should return data" do
@@ -118,6 +123,17 @@ shared_examples_for "Eprime::Transformers::ColumnCalculator with edata" do
     }.should raise_error(Eprime::Transformers::ColumnCalculator::ComputationError)
   end
   
+  it "should work in a RowFilter" do
+    d = mock_edata
+    cc = Eprime::Transformers::ColumnCalculator.new
+    cc.data = d
+    cc.sort_expression = '1'
+    filtered = Eprime::Transformers::RowFilter.new(cc, lambda {|r| true})
+    filtered.each do |r|
+      r.should_not be_nil
+    end
+  end
+  
 end
 
 describe Eprime::Transformers::ColumnCalculator do
@@ -139,29 +155,29 @@ describe Eprime::Transformers::ColumnCalculator do
 
     it "should return data for data columns" do
       @edata[0]['stim_time'].should_not be_nil
-      @calc[0].compute('stim_time').should == @edata[0]['stim_time']
+      @calc[0]['stim_time'].should == @edata[0]['stim_time']
     end
     
     it "should compute static columns on single rows" do
       @calc.computed_column "always_1", "1"
-      @calc[0].compute("always_1").should == "1"
+      @calc[0]["always_1"].should == "1"
     end
     
     it "should compute on single rows with some math" do
       @calc.computed_column "test", "(3+2)*4"
-      @calc[0].compute("test").should == ((3+2)*4).to_s
+      @calc[0]["test"].should == ((3+2)*4).to_s
     end
     
     it "should allow adding two columns" do 
       @calc.computed_column "always_1", "1"
       @calc.computed_column "test", "(3+2)*4"
-      @calc[0].compute("always_1").should == "1"
-      @calc[0].compute("test").should == ((3+2)*4).to_s
+      @calc[0]["always_1"].should == "1"
+      @calc[0]["test"].should == ((3+2)*4).to_s
     end
     
     it "should raise when computing nonexistent column" do
       lambda {
-        @calc[0].compute('nonexistent')
+        @calc[0]['nonexistent']
       }.should raise_error(IndexError)
     end
 
