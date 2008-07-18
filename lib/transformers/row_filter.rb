@@ -17,22 +17,32 @@ module Eprime
       def initialize(data, filter)
         @data = data
         @filter = filter
+        @computed = nil
       end
     
       def to_eprime_data
-        Eprime::Data.new().merge!(self)
-      end
-    
-      def each
-        @data.each do |row|
-          yield row if match?(row)
-        end
+        computed
       end
       
-      def columns
-        @data.columns
+      def method_missing(method, *args, &block)
+        computed.send method, *args, &block
       end
-    
+      
+      private
+      
+      def computed
+        return @computed if @computed
+        @computed = Eprime::Data.new(@data.columns)
+        @data.find_all{ |row|
+          match?(row)
+        }.each { |row|
+          r = @computed.add_row
+          r.values = row.values
+          r.sort_value = row.sort_value
+        }
+        return @computed
+      end
+      
       def match?(row)
         if @filter.is_a? Proc
           return @filter.call(row)

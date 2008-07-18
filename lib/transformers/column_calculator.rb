@@ -47,10 +47,6 @@ module Eprime
       end
     
       def data=(data)
-        unless data.kind_of?(Eprime::Data)
-
-          raise Exception.new("Should be Eprime::Data, is actually #{data.class} -- #{data.kind_of?(Eprime::Data)}")
-        end
         @data = data
         @data_cols = []
         @data.columns.each do |col_name|
@@ -66,6 +62,8 @@ module Eprime
       def column_index(col_id)
         return @column_indexes[col_id]
       end
+      
+      alias :find_column_index :column_index
     
       def column(col_id)
         index = column_index(col_id)
@@ -158,7 +156,6 @@ module Eprime
       def compute_data!
         @computed = Eprime::Data.new(columns)
         @data.each_index do |i|
-          #row = @computed.add_row
           row = Row.new(self, @data[i])
           # Loop over each column type -- it's still (slighyly) important that
           # we go over each column type specifically. When counter columns
@@ -182,10 +179,7 @@ module Eprime
           end
           new_row = @computed.add_row
           new_row.sort_value = sv
-          row.columns.each do |c|
-            new_row[c] = row[c]
-          end
-          #@computed.add_row_values(row.values, sv)
+          new_row.values = row.values
         end
         @computed
       end

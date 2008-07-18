@@ -62,21 +62,31 @@ module Eprime
     # Returns a new Eprime::Data object containing the data from this
     # and all other data sets
     def merge(*datasets)
-      #all_cols = datasets.map { |d| d.columns }
-      #cols = all_cols.flatten.uniq
-      d = Eprime::Data.new()
+      all_cols = [self, *datasets].map { |d| d.columns }
+      cols = all_cols.flatten.uniq
+      d = Eprime::Data.new(cols)
       return d.merge!(self, *datasets)
     end
     
     # Combine more Eprime::Data objects into this one, in-place
     def merge!(*datasets)
       datasets.each do |source|
-        source.each do |row|
-          r = self.add_row
-          row.columns.each do |col|
-            r[col] = row[col]
+        if source.columns == self.columns
+          # The fast option
+          source.each do |row|
+            r = self.add_row
+            r.sort_value = row.sort_value
+            r.values = row.values
           end
-          r.sort_value = row.sort_value
+        else
+          # The general case option
+          source.each do |row|
+            r = self.add_row
+            row.columns.each do |col|
+              r[col] = row[col]
+            end
+            r.sort_value = row.sort_value
+          end
         end
       end
       return self
@@ -102,7 +112,6 @@ module Eprime
     end
     
     def add_row()
-      # THIS IS NOT ACCEPTABLE, FIX IT TOMORROW.
       row = Row.new(self)
       @rows << row
       return row
@@ -168,17 +177,12 @@ module Eprime
       end
       
       def values
-        vals = []
-        @parent.columns.each_index do |i|
-          vals[i] = @data[i]
-        end
-        return vals
+        return @data
       end
       
-      def dup
-        
+      def values=(ar)
+        @data = ar
       end
-      
     end
   end
   

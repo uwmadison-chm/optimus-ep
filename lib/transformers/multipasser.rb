@@ -87,9 +87,9 @@ module Eprime
           # We want to duplicate the data, add a sort expression to it, add
           # computed columns, filter it, and then merge it into the complete
           # dataset.
-          cur_data = @data.to_eprime_data 
+          #cur_data = @data.to_eprime_data 
           comp_data = ColumnCalculator.new
-          comp_data.data = cur_data
+          comp_data.data = @data
           comp_data.sort_expression = pass.sort_expression
           pass.computed_columns.each do |col|
             name, expr = *col
