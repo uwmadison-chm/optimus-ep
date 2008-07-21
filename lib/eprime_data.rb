@@ -52,9 +52,7 @@ module Eprime
       @column_hash = {}
       @columns_set_in_initialize = false
       if (columns && columns.length > 0)
-        columns.each do |col|
-          idx = self.find_or_add_column_index(col)
-        end
+        add_columns!(columns)
         @columns_set_in_initialize = true
       end
     end
@@ -62,8 +60,7 @@ module Eprime
     # Returns a new Eprime::Data object containing the data from this
     # and all other data sets
     def merge(*datasets)
-      all_cols = [self, *datasets].map { |d| d.columns }
-      cols = all_cols.flatten.uniq
+      cols = [self, *datasets].map { |d| d.columns }.flatten.uniq
       d = Eprime::Data.new(cols)
       return d.merge!(self, *datasets)
     end
@@ -71,6 +68,7 @@ module Eprime
     # Combine more Eprime::Data objects into this one, in-place
     def merge!(*datasets)
       datasets.each do |source|
+        add_columns!(source.columns)
         if source.columns == self.columns
           # The fast option
           source.each do |row|
@@ -140,6 +138,13 @@ module Eprime
         raise ColumnAddedWarning.new("Error: Added column #{col_id} after specifying columns at init", index)
       end
       return index
+    end
+    
+    private
+    def add_columns!(col_arr)
+      col_arr.each do |c|
+        find_or_add_column_index(c)
+      end
     end
     
     class Row

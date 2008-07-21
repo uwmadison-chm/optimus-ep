@@ -11,19 +11,10 @@ require 'rubygems'
 require 'optparse'
 gem 'optimus-ep'
 require 'runners/generic_runner'
-require 'ruby-prof'
-t1 = Time.now.to_f
+
 begin
-  RubyProf.start
-  
   txr = Eprime::Runners::GenericRunner.new(Eprime::Transformers::TimingExtractor, ARGV)
   txr.process!
-  result = RubyProf.stop
-  printer = RubyProf::GraphHtmlPrinter.new(result)
-  File.open('calls2.html', 'w') do |f|
-    printer.print(f)
-  end
-  
 rescue ArgumentError => e
   STDERR.puts e.message
   exit 1
@@ -31,6 +22,3 @@ rescue Exception => e
   STDERR.puts e.message
   exit 2
 end
-dur = Time.now.to_f - t1
-
-puts "Total time: #{dur} s"

@@ -43,11 +43,10 @@ module Eprime
       end
       
       def read_data
-        data = Eprime::Data.new
+        data = Eprime::Data.new()
         @options.input_files.each do |infile|
           File.open(infile) do |f|
-            new_data = Eprime::Reader.new(f).eprime_data
-            data.merge!(new_data)
+            data.merge!(Eprime::Reader.new(f).eprime_data)
           end
         end
         @data = data
