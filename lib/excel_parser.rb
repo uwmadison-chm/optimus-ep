@@ -16,6 +16,11 @@ module Eprime
         options = options.merge(:skip_lines => 1)
         super(file, options)
       end
+      
+      def self.can_parse?(lines)
+        ary = lines.map {|l| l.strip.split("\t")}
+        ary[0].size == 1 and ary[1].size >= 3
+      end
     end
   end
 end

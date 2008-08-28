@@ -8,6 +8,7 @@
 require 'log_file_parser'
 require 'excel_parser'
 require 'eprimetab_parser'
+require 'raw_tab_parser'
 
 module Eprime
   
@@ -19,7 +20,8 @@ module Eprime
     attr_reader :type, :parser, :input
     attr_accessor :options
     
-    TYPES = {:log => LogfileParser, :excel => ExcelParser, :eprime => EprimetabParser}
+    PARSERS = [LogfileParser, ExcelParser, EprimetabParser, RawTabParser]
+
     def initialize(input = nil, options = {})
       @options = options || {}
       set_input(input) unless input.nil?
@@ -36,7 +38,6 @@ module Eprime
     
     def options=(options)
       @options = options || {}
-      set_parser!
     end
     
     private
@@ -72,17 +73,12 @@ module Eprime
       if @type.nil?
         raise UnknownTypeError.new("Can't determine the type of #{file.path}")
       end
-      set_parser!
-    end
-    
-    def set_parser!
       @eprime_data = nil
-      return unless @type && TYPES[@type]
-      @parser = TYPES[@type].new(@file, @options)
+      @parser = @type.new(@file, @options)
     end
     
     # Determines the type of an eprime file, based on its first two lines.
-    # Returns one of [:log, :eprime_csv, :excel_csv, nil]
+    # Returns one of the elements of PARSERS or nil
     def determine_file_type(first_lines)
       # Log files start with *** Header Start ***
       #
@@ -91,15 +87,9 @@ module Eprime
       #
       # eprime CSV files will have at least three tab-delimited elements on the first line
       
-      if first_lines[0].index("*** Header Start ***")
-        return :log
-      elsif (first_lines[0]["\t"].nil? and first_lines[1].split("\t").size >= 3)
-        return :excel
-      elsif (first_lines[0].split("\t").size >= 3 and first_lines[1].split("\t").size >= 3)
-        return :eprime
-      end
-      # Don't know? Return nil.
-      return nil
+      return PARSERS.detect { |parser_class| 
+        parser_class.can_parse?(first_lines)
+      }
     end
   end
 end

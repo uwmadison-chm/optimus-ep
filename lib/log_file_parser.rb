@@ -11,6 +11,7 @@ module Eprime
     # Reads and parses E-Prime log files (the ones that start with 
     # *** Header Start ***) and transforms them into an Eprime::Data structure
     
+    
     class LogfileParser
       # Handles parsing eprime log files, which are essentially a blow-by-blow
       # log of everything that happened during an eprime run.
@@ -91,6 +92,10 @@ module Eprime
       # Define this as a column we *should not* include in out output.
       def skip_column(col_name)
         @skip_columns[col_name] = true
+      end
+      
+      def self.can_parse?(lines)
+        lines[0].include?('*** Header Start ***')
       end
       
       private

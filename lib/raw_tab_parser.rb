@@ -6,25 +6,21 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 # This almost completely delegates to TabfileParser
+# It differs from EprimetabParser only in that it doesn't skip any lines.
 
 require 'tabfile_parser'
 
 module Eprime
   class Reader
-    class EprimetabParser < TabfileParser
+    class RawTabParser < TabfileParser
       def initialize(file, options = {})
-        options = options.merge(:skip_lines => 3)
+        options = options.merge(:skip_lines => 0)
         super(file, options)
       end
       
       def self.can_parse?(lines)
-        divided = lines.map { |l| l.strip.split("\t") }
-        return (
-          divided[0].size >= 3 and 
-          divided[0].size == divided[1].size and
-          divided[0][0] == 'STRING' and
-          divided[1][0] == 'EXPNAME'
-        )
+        ary = lines.map { |l| l.strip.split("\t") }
+        ary[0].size > 1 and ary.all? {|e| e.size == ary[0].size}
       end
     end
   end

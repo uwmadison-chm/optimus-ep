@@ -40,7 +40,7 @@ describe Eprime::Reader do
     
     it "should detect log files" do
       @reader.input = (@file)
-      @reader.type.should == :log
+      @reader.type.should == Eprime::Reader::LogfileParser
     end
 
     it "should return the Eprime::Reader::LogfileParser" do
@@ -72,7 +72,7 @@ describe Eprime::Reader do
   
     it "should detect excel csv files" do
       @reader.input = @file
-      @reader.type.should == :excel
+      @reader.type.should == Eprime::Reader::ExcelParser
     end
     
     it "should resutn the Eprime::Reader::ExcelParser" do
@@ -96,7 +96,7 @@ describe Eprime::Reader do
     
     it "should detect eprime csv files" do
       @reader.input = @file
-      @reader.type.should == :eprime
+      @reader.type.should == Eprime::Reader::EprimetabParser
     end
     
     it "should return the Eprime::Reader::EprimetabParser" do
@@ -109,6 +109,18 @@ describe Eprime::Reader do
       data = @reader.eprime_data
       data.length.should > 0
       data.columns.sort.should == SORTED_COLUMNS
+    end
+  end
+  
+  describe "with raw tsv files" do
+    before :each do
+      @file = File.open(RAW_TSV_FILE)
+    end
+    
+    
+    it "should detect tsv files" do
+      @reader.input = @file
+      @reader.type.should == Eprime::Reader::RawTabParser
     end
   end
 

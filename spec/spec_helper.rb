@@ -12,6 +12,7 @@ module EprimeTestHelper
     EXCEL_FILE = File.join(SAMPLE_DIR, 'excel_tsv.txt')
     BAD_EXCEL_FILE = File.join(SAMPLE_DIR, 'bad_excel_tsv.txt')
     EPRIME_FILE = File.join(SAMPLE_DIR, 'eprime_tsv.txt')
+    RAW_TSV_FILE = File.join(SAMPLE_DIR, 'raw_tsv.txt')
     UNKNOWN_FILE = File.join(SAMPLE_DIR, 'unknown_type.txt')
     UNREADABLE_FILE = File.join(SAMPLE_DIR, 'unreadable_file')
     CORRUPT_LOG_FILE = File.join(SAMPLE_DIR, 'corrupt_log_file.txt')
