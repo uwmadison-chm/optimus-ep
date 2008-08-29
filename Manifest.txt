@@ -13,6 +13,7 @@ lib/eprime_reader.rb
 lib/eprimetab_parser.rb
 lib/excel_parser.rb
 lib/log_file_parser.rb
+lib/raw_tab_parser.rb
 lib/runners/generic_runner.rb
 lib/tabfile_parser.rb
 lib/tabfile_writer.rb
