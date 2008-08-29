@@ -238,6 +238,10 @@ module Eprime
           if path.include?(@name) 
             raise ComputationError.new("#{compute_str} contains a loop with #{@name} -- can't compute")
           end
+          
+          # Allow defining the column computation as a lambda
+          return @expression.expr.call(row) if @expression.expr.is_a? Proc
+            
 
           column_names = @expression.columns
           column_names.each do |col_name|
@@ -346,15 +350,18 @@ module Eprime
     
       class Expression
         attr_reader :columns
+        attr_reader :expr
       
         COLUMN_FINDER = /\{([^}]*)\}/ # Finds strings like {foo} and {bar}
         def initialize(expr_string)
           @expr = expr_string
-          @columns = find_columns(expr_string).freeze
+          unless expr_string.is_a? Proc
+            @columns = find_columns(expr_string).freeze 
+          end
         end
       
         def to_s
-          @expr.dup
+          @expr.to_s.dup
         end
       
         private

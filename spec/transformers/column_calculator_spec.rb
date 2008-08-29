@@ -180,6 +180,11 @@ describe Eprime::Transformers::ColumnCalculator do
         @calc[0]['nonexistent']
       }.should raise_error(IndexError)
     end
+    
+    it "should allow computing via lambda" do
+      @calc.computed_column "always_1", lambda {|r| "1"}
+      @calc[0]["always_1"].should == "1"
+    end
 
     it "should compute constants via indexing" do 
       @calc.computed_column "always_1", "1"
@@ -211,6 +216,16 @@ describe Eprime::Transformers::ColumnCalculator do
       @calc.computed_column "stim_time_s", "{stim_time}/1000"
       @calc.each do |row|
         row["stim_time_s"].should == (row["stim_time"].to_f/1000.0).to_s
+      end
+    end
+    
+    it "should compute based on data columns by lambda" do
+      @calc.computed_column "stim_time_s", lambda { |row|
+        row['stim_time'].to_f/1000
+      }
+      @calc.columns.should include('stim_time_s')
+      @calc.each do |row|
+        row['stim_time_s'].should == row['stim_time'].to_f/1000
       end
     end
     
