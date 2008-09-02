@@ -1,3 +1,9 @@
+== 0.6.5 9/2/2008
+* New features:
+  * Speed! Speed! Speed! Should be something like 10x faster.
+  * Procs are now allowed in ComputedColumns -- so if you want to do really
+    arbitrary things in your column computation, have at it.
+
 == 0.6.0 7/14/2008
 * New features:
   * Added extract_timings, a script to pull stimulus timing data from eprime
