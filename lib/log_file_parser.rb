@@ -56,9 +56,7 @@ module Eprime
             make_frames!
           end
         rescue Exception => e
-          unless @force
-            raise e
-          end
+          raise e unless @force
         end
         if @columns
           data = Eprime::Data.new(@columns)
