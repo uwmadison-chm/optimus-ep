@@ -204,8 +204,18 @@ module Eprime
           return my_data
         end
         
-        def method_missing(meth, *args)
-          @data.send meth, *args
+        # Methods to make this behave hashlike. Don't just delegate to 
+        # the @data hash; that's less clear.
+        def [](key)
+          return @data[key]
+        end
+        
+        def []=(key, val)
+          @data[key] = val
+        end
+        
+        def keys
+          @data.keys
         end
       end
     end # Class LogfileParser
