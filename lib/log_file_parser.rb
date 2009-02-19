@@ -39,8 +39,10 @@ module Eprime
         @force = options[:force]
         @file = file
         @levels = [''] # The 0 index should be blank.
-        @top_level = 0 # This is the level of the frame that'll generate output rows
-        @skip_columns = {} # A hash of columns we *don't* want to add -- just define the strings
+        @top_level = 0 # This is the level of the frame that'll 
+                       # generate output rows
+        @skip_columns = {} # A hash of columns we *don't* want to add -- 
+        @found_columns = [] # We'll keep track of columns as we find them
       end
       
       def make_frames!
@@ -103,8 +105,9 @@ module Eprime
       def frameify(file)
         in_frame = false
         frames = []
+        # This 
         frame = Frame.new(self)
-        level = 0
+        frame.level = 0
         file.each_line do |line|
           # TODO? Refactor this out into its own private function
           l_s = line.strip
@@ -130,7 +133,11 @@ module Eprime
             end
           end
         end
-        raise DamagedFileError.new("Last frame never closed in #{file.path}") if in_frame
+        if in_frame
+          raise DamagedFileError.new(
+            "Last frame never closed in #{file.path}"
+          ) 
+          end
         return frames
       end
       
@@ -214,6 +221,44 @@ module Eprime
         
         def keys
           @data.keys
+        end
+      end
+      
+      class ColumnList
+        def initialize(levels = [], cols = [])
+          @levels = levels
+          @cols = cols
+          @name_uses = Hash.new(0)
+        end
+        
+        def store(name, level)
+          if (level >= @levels.length  or level < 1)
+            raise IndexError.new(
+              "Level #{level} must be between 1 and #{@levels.length-1}")
+          end
+          col = Column.new(name, level)
+          if not @cols.include?(col)
+            @cols << Column.new(name, level)
+            @name_uses[name] += 1
+          end
+        end
+        
+        def names
+          return @cols.map { |c| 
+            (@name_uses[c.name] == 1) ? c.name : "#{c.name}[#{@levels[c.level]}]"
+          }
+        end
+        
+        class Column
+          attr_accessor :name, :level
+          def initialize(name, level)
+            @name = name
+            @level = level
+          end
+          
+          def ==(c)
+            @name == c.name and @level == c.level
+          end
         end
       end
     end # Class LogfileParser

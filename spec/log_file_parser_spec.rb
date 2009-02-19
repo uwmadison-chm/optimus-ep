@@ -66,7 +66,7 @@ describe Eprime::Reader::LogfileParser do
     it "should have a parent in the first frame" do
       @reader.frames.first.parent.should_not be_nil
     end
-  
+    
     describe "making eprime data" do
       before :each do
         @eprime = @reader.to_eprime
@@ -75,6 +75,11 @@ describe Eprime::Reader::LogfileParser do
       it "should generate three rows from the example file" do
         @eprime.length.should == 3
       end
+      
+      it "should follow the column order in the example file"# do
+      #  @eprime.columns[0].should == "ExperimentName"
+      #  @eprime.columns[1].should == "SessionDate"
+      #end
       
       it "should ignore extra colons in input data" do
         @eprime.first['SessionTime'].should == '11:11:11'
@@ -151,6 +156,49 @@ describe Eprime::Reader::LogfileParser do
         should raise_error(Eprime::DamagedFileError)
     end
     
+  end
+  
+end
+
+describe Eprime::Reader::LogfileParser::ColumnList do
+  before :each do
+    @levels = ['', 'Foo', 'Bar']
+    @list = Eprime::Reader::LogfileParser::ColumnList.new(@levels)
+  end
+  
+  it "should raise error when storing index 0" do
+    lambda {
+      @list.store('test', 0)
+    }.should raise_error(IndexError)
+  end
+  
+  it "should raise error when storing out of bounds" do
+    lambda {
+      @list.store('test', @levels.length)
+    }.should raise_error(IndexError)
+  end
+    
+  it "should record and return names" do
+    @list.store('test', 1)
+    @list.names.should == ['test']
+  end
+  
+  it "should not re-add repeated name at same level" do
+    @list.store('test', 1)
+    @list.store('test', 1)
+    @list.names.should == ['test']
+  end
+
+  it "should record unique column names at different levels" do
+    @list.store('test', 1)
+    @list.store('another_test', 2)
+    @list.names.should == ['test', 'another_test']
+  end
+  
+  it "should add level names to repeated column names at different levels" do
+    @list.store('test', 1)
+    @list.store('test', 2)
+    @list.names.should == ['test[Foo]', 'test[Bar]']
   end
   
 end
