@@ -115,10 +115,6 @@ module Eprime
       return row
     end
     
-    #def add_row_values(values, sort_value = 1)
-    #  r = Row.new(self, values, sort_value)
-    #end
-    
     def find_column_index(col_id)
       @column_hash[col_id]
     end
@@ -126,8 +122,8 @@ module Eprime
     def find_or_add_column_index(col_id)
       index_id = find_column_index(col_id)
       # If index_id was a string, nil means we may want to add it. If it's a
-      # numeric index, we want to return nil from here -- we're not gonna add unnamed
-      # indexes.
+      # numeric index, we want to return nil from here -- we're not gonna add 
+      # unnamed indexes.
       return index_id if index_id or col_id.is_a?(Fixnum)
       # In this case, we're adding a column...
       index = @columns.size
@@ -135,7 +131,10 @@ module Eprime
       @column_hash[col_id] = index
       @column_hash[index] = index
       if @columns_set_in_initialize and not @options[:ignore_warnings]
-        raise ColumnAddedWarning.new("Error: Added column #{col_id} after specifying columns at init", index)
+        raise ColumnAddedWarning.new(
+          "Error: Added column #{col_id} after specifying columns at init", 
+          index
+        )
       end
       return index
     end
@@ -159,7 +158,7 @@ module Eprime
       
       def [](index)
         num_index = @parent.find_column_index(index)
-        unless (num_index.is_a?(Fixnum) and @parent.columns.length > num_index)
+        unless (num_index.is_a?(Fixnum) and @parent.columns.length>num_index)
           raise IndexError.new("Column #{num_index} does not exist")
         end
         return @data[num_index]

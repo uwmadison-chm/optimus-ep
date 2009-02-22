@@ -26,8 +26,6 @@ module Eprime
       attr_reader :frames
       attr_reader :levels
       attr_reader :top_level
-      attr_reader :skip_columns
-      
       # Valid things for the options hash:
       #   :columns => an array of strings, predefining the expected columns 
       #               (and their order)
@@ -41,8 +39,7 @@ module Eprime
         @levels = [''] # The 0 index should be blank.
         @top_level = 0 # This is the level of the frame that'll 
                        # generate output rows
-        @skip_columns = {} # A hash of columns we *don't* want to add -- 
-        @found_columns = [] # We'll keep track of columns as we find them
+        @found_cols = ColumnList.new()
       end
       
       def make_frames!
@@ -60,26 +57,15 @@ module Eprime
         rescue Exception => e
           raise e unless @force
         end
-        if @columns
-          data = Eprime::Data.new(@columns)
-        else
-          data = Eprime::Data.new
-        end
+    
+        @columns ||= @found_cols.names
+        data = Eprime::Data.new(@columns)
         self.top_frames.each do |frame|
           row = data.add_row
-          frame.columns.each do |column, value|
-            begin
-              # Do a check for columns to skip -- this will happen in the case
-              # where you have Procedure[Session] and Procedure[Task] -- we
-              # shouldn't have Procedure, in that case.
-              unless @skip_columns[column]
-                row[column] = value
-              end
-            rescue Exception => e
-              unless @force
-                raise e
-              end
-            end
+          @found_cols.names_with_cols.each do |pair|
+            name, col = *pair
+            val = frame.get(col)
+            row[name] = val
           end
         end
         return data
@@ -130,6 +116,7 @@ module Eprime
               # One more special thing: Experiment gets renamed ExperimentName. WTF?
               key = "ExperimentName" if key == "Experiment"
               frame[key] = val
+              @found_cols.store(Column.new(key, frame.level))
             end
           end
         end
@@ -153,6 +140,7 @@ module Eprime
             end
           else
             if key == HEADER_END
+              @found_cols.levels = @levels
               file.rewind
               return # Get out of this function!
             else
@@ -169,6 +157,7 @@ module Eprime
         @frames.each do |frame|
           counts[frame.level] += 1
           key = @levels[frame.level]
+          @found_cols.store(Column.new(key, frame.level))
           frame[key] = counts[frame.level]
           counts.fill(0, (frame.level+1)..@levels.length)
         end
@@ -183,6 +172,8 @@ module Eprime
       end
       
       class Frame
+        include Enumerable
+        
         attr_accessor :level
         attr_accessor :parent
         def initialize(parser)
@@ -192,73 +183,99 @@ module Eprime
           @parser = parser
         end
         
-        def columns
-          my_data = @data.dup
-          return my_data if @parent.nil?
-          parent_data = @parent.columns
-          parent_data.each do |key, val|
-            if my_data.has_key?(key)
-              @parser.skip_column(key)
-              # Append a string like "[Session]" or "[Block]" to the key name
-              my_data["#{key}[#{@parser.levels[@level]}]"] = my_data[key]
-              my_data["#{key}[#{@parser.levels[@parent.level]}]"] = val
-            else
-              my_data[key] = parent_data[key]
-            end
-          end
-          return my_data
-        end
-        
         # Methods to make this behave hashlike. Don't just delegate to 
         # the @data hash; that's less clear.
         def [](key)
-          return @data[key]
+          return @data[Column.new(key, @level).to_s]
         end
         
         def []=(key, val)
-          @data[key] = val
+          @data[Column.new(key, @level).to_s] = val
         end
         
         def keys
           @data.keys
         end
+        
+        def each
+          @data.each do |k, v|
+            yield k, v
+          end
+        end
+        
+        def get(col)
+          # If the value is supposed to be at our level, return it (nil is OK)
+          return @data[col.to_s] if col.level == @level
+          # If it could be in our parent, return that.
+          return @parent.get(col) if (@parent && col.level < @level)
+          # If that's not an option,
+          return nil
+        end
       end
       
       class ColumnList
+        attr_accessor :levels
         def initialize(levels = [], cols = [])
           @levels = levels
           @cols = cols
           @name_uses = Hash.new(0)
         end
         
-        def store(name, level)
-          if (level >= @levels.length  or level < 1)
+        def store(col)
+          if (col.level >= @levels.length  or col.level < 1)
             raise IndexError.new(
-              "Level #{level} must be between 1 and #{@levels.length-1}")
+              "Level #{col.level} must be between 1 and #{@levels.length-1}")
           end
-          col = Column.new(name, level)
           if not @cols.include?(col)
-            @cols << Column.new(name, level)
-            @name_uses[name] += 1
+            @cols << col
+            @name_uses[col.name] += 1
           end
         end
         
         def names
-          return @cols.map { |c| 
-            (@name_uses[c.name] == 1) ? c.name : "#{c.name}[#{@levels[c.level]}]"
+          return self.names_with_cols.map { |c| 
+            c[0]
           }
         end
         
-        class Column
-          attr_accessor :name, :level
-          def initialize(name, level)
-            @name = name
-            @level = level
+        def names_with_cols
+          ncm = sorted_cols.map {|c| [
+              (@name_uses[c.name]==1) ? 
+                c.name : "#{c.name}[#{@levels[c.level]}]",
+              c ]}
+          return ncm
+        end
+        
+        def sorted_cols
+          cwi = []
+          @cols.each_with_index do |col, i|
+            cwi << [col, i]
           end
-          
-          def ==(c)
-            @name == c.name and @level == c.level
-          end
+          return cwi.sort_by {|elem| [elem[0].level, elem[1]]}.map {|elem| 
+            elem[0]
+          }
+        end
+        
+
+      end
+
+      class Column
+        attr_accessor :name, :level
+        def initialize(name, level)
+          @name = name
+          @level = level
+        end
+        
+        def ==(c)
+          @name == c.name and @level == c.level
+        end
+        
+        def hash
+          return self.to_s.hash
+        end
+        
+        def to_s
+          "#{@name}[#{@level}]"
         end
       end
     end # Class LogfileParser

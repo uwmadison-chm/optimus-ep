@@ -94,7 +94,6 @@ Display.RefreshRate: 60.000
 	*** LogFrame End ***
 Level: 1
 *** LogFrame Start ***
-CarriedVal: SessionLevel
 Experiment: optimus_test
 SessionDate: 03-15-2008
 SessionTime: 11:11:11
@@ -105,6 +104,7 @@ Session: 1
 Display.RefreshRate: 60.000
 Clock.Scale: 1
 NumPeriods: 3 
+CarriedVal: SessionLevel
 PeriodA: 10000 
 PeriodB: 10000 
 *** LogFrame End ***

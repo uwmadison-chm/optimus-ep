@@ -76,10 +76,10 @@ describe Eprime::Reader::LogfileParser do
         @eprime.length.should == 3
       end
       
-      it "should follow the column order in the example file"# do
-      #  @eprime.columns[0].should == "ExperimentName"
-      #  @eprime.columns[1].should == "SessionDate"
-      #end
+      it "should follow the column order in the example file" do
+        @eprime.columns[0].should == "ExperimentName"
+        @eprime.columns[1].should == "SessionDate"
+      end
       
       it "should ignore extra colons in input data" do
         @eprime.first['SessionTime'].should == '11:11:11'
@@ -93,10 +93,6 @@ describe Eprime::Reader::LogfileParser do
         @eprime.columns.should_not include("CarriedVal")
       end
       
-      it "should mark ambiguous columns for skip" do
-        @reader.skip_columns.should include("CarriedVal")
-      end
-    
       it "should include columns from level 2 and level 1 frames" do
         @eprime.columns.should include("RandomSeed")
         @eprime.columns.should include("BlockTitle")
@@ -162,43 +158,53 @@ end
 
 describe Eprime::Reader::LogfileParser::ColumnList do
   before :each do
+    @cklass = Eprime::Reader::LogfileParser::Column
     @levels = ['', 'Foo', 'Bar']
     @list = Eprime::Reader::LogfileParser::ColumnList.new(@levels)
   end
   
   it "should raise error when storing index 0" do
     lambda {
-      @list.store('test', 0)
+      @list.store(@cklass.new('test', 0))
     }.should raise_error(IndexError)
   end
   
   it "should raise error when storing out of bounds" do
     lambda {
-      @list.store('test', @levels.length)
+      @list.store(@cklass.new('test', @levels.length))
     }.should raise_error(IndexError)
   end
     
   it "should record and return names" do
-    @list.store('test', 1)
+    @list.store(@cklass.new('test', 1))
     @list.names.should == ['test']
   end
   
   it "should not re-add repeated name at same level" do
-    @list.store('test', 1)
-    @list.store('test', 1)
+    @list.store(@cklass.new('test', 1))
+    @list.store(@cklass.new('test', 1))
     @list.names.should == ['test']
   end
 
   it "should record unique column names at different levels" do
-    @list.store('test', 1)
-    @list.store('another_test', 2)
+    @list.store(@cklass.new('test', 1))
+    @list.store(@cklass.new('another_test', 2))
     @list.names.should == ['test', 'another_test']
   end
   
   it "should add level names to repeated column names at different levels" do
-    @list.store('test', 1)
-    @list.store('test', 2)
+    @list.store(@cklass.new('test', 1))
+    @list.store(@cklass.new('test', 2))
     @list.names.should == ['test[Foo]', 'test[Bar]']
+  end
+  
+  it "should return paired columns with names" do
+    col = @cklass.new('test', 1)
+    @list.store(col)
+    
+    @list.names_with_cols.should == [
+      ['test', col]
+    ]
   end
   
 end
