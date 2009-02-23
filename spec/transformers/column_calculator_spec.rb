@@ -395,6 +395,18 @@ describe Eprime::Transformers::ColumnCalculator do
         row['reset_on_sparse'].should == i
       end
     end
+    
+    it "should accept a Proc as a :start_value" do
+      @calc.counter_column "scan_delay", :start_value => lambda {|row|
+        row['stim_time'].to_i - row['run_start'].to_i
+      }
+      sd = @calc[0]['scan_delay']
+      i = 0
+      @calc.each do |row|
+        row['scan_delay'].should == sd+i
+        i += 1
+      end
+    end
   end
 end
 

@@ -240,7 +240,7 @@ module Eprime
           end
           
           # Allow defining the column computation as a lambda
-          return @expression.expr.call(row) if @expression.expr.is_a? Proc
+          return @expression.expr.call(row) if @expression.expr.respond_to? :call
             
 
           column_names = @expression.columns
@@ -278,9 +278,12 @@ module Eprime
           if @reset_when.call(row)
             @current_value = @start_value
           end
+          if @current_value.respond_to? :call
+            @current_value = @current_value.call(row)
+          end
         
           if @count_when.call(row)
-            if @count_by.is_a? Proc
+            if @count_by.respond_to? :call
               @current_value = @count_by.call(@current_value)
             elsif @count_by.is_a?(Symbol) || @count_by.is_a?(String)
               @current_value = @current_value.send(@count_by)
