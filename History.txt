@@ -1,3 +1,10 @@
+== 0.6.9 2/25/2008
+* New features:
+  * Supports parsing raw tab-delmimted files
+  * Allows Procs as starting values for ComputedColumns
+* Bug fixes:
+  * No longer jumbles the order of Eprime log files
+
 == 0.6.5 9/2/2008
 * New features:
   * Speed! Speed! Speed! Should be something like 10x faster.
