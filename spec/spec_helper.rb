@@ -30,6 +30,34 @@ module EprimeTestHelper
     RoundTrip.new(expected)
   end
   
+  class ParseSuccessfully
+    def initialize(expected)
+      @expected = expected
+    end
+    
+    def matches?(target)
+      begin
+        @parsed = target.parse(@expected)
+      rescue RParsec::ParserException => e
+        @message = e.message
+        return false
+      end
+      return true
+    end
+    
+    def failure_message
+      "expected #{@expected} to parse; raised #{@message}"
+    end
+    
+    def negative_failure_message
+      "expected #{@expected} not to parse"
+    end
+  end
+  
+  def parse_successfully(expected)
+    ParseSuccessfully.new(expected)
+  end
+  
   unless constants.include?('SAMPLE_DIR')
     SAMPLE_DIR = File.join(File.dirname(__FILE__), 'samples')
     LOG_FILE = File.join(SAMPLE_DIR, 'optimus_log.txt')
