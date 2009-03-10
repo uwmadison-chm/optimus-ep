@@ -6,6 +6,30 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 module EprimeTestHelper
+  
+  class RoundTrip
+    def initialize(expected)
+      @expected = expected
+    end
+    
+    def matches?(target)
+      @parsed = target.parse(@expected).to_s
+      @parsed == @expected
+    end
+    
+    def failure_message
+      "expected #{@parsed} to parse to #{@expected}"
+    end
+    
+    def negative_failure_message
+      "Expected #{@parsed} to not parse to #{@expected}"
+    end
+  end
+  
+  def round_trip(expected)
+    RoundTrip.new(expected)
+  end
+  
   unless constants.include?('SAMPLE_DIR')
     SAMPLE_DIR = File.join(File.dirname(__FILE__), 'samples')
     LOG_FILE = File.join(SAMPLE_DIR, 'optimus_log.txt')

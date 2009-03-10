@@ -1,6 +1,7 @@
 require 'rake'
 require 'spec/rake/spectask'
-require 'config/requirements'
+#require 'config/requirements'
+require 'hoe'
 require 'config/hoe' # setup Hoe + all gem configuration
 
 Dir['tasks/**/*.rake'].each { |rake| load rake }

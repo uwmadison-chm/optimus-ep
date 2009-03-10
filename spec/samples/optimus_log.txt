@@ -19,20 +19,13 @@ Subject: 1
 Session: 1
 Display.RefreshRate: 60.000
 *** Header End ***
-		Level: 3
-		*** LogFrame Start ***
-		BlockList: 1
-		TypeA: Danger
-		TypeB: 2
-		Procedure: RunTrial
-		BlockList.Cycle: 1
-		BlockList.Sample: 1
-		Running: TestList
-		StartTime: 5000
-		Stim1.OnsetTime: 88684
-		Stim1.OffsetTime: 93583
-		CarriedVal: TrialLevel
-		*** LogFrame End ***
+	Level: 2
+	*** LogFrame Start ***
+	Procedure: Prep
+	Running: prepProc
+	CarriedVal: BlockLevel
+	BlockTitle: Prep
+	*** LogFrame End ***
 	Level: 2
 	*** LogFrame Start ***
 	BlockTitle: My Task

@@ -25,7 +25,6 @@ module Eprime
       
       attr_reader :frames
       attr_reader :levels
-      attr_reader :top_level
       # Valid things for the options hash:
       #   :columns => an array of strings, predefining the expected columns 
       #               (and their order)
@@ -37,8 +36,6 @@ module Eprime
         @force = options[:force]
         @file = file
         @levels = [''] # The 0 index should be blank.
-        @top_level = 0 # This is the level of the frame that'll 
-                       # generate output rows
         @found_cols = ColumnList.new()
       end
       
@@ -60,7 +57,7 @@ module Eprime
     
         @columns ||= @found_cols.names
         data = Eprime::Data.new(@columns)
-        self.top_frames.each do |frame|
+        self.leaf_frames.each do |frame|
           row = data.add_row
           @found_cols.names_with_cols.each do |pair|
             name, col = *pair
@@ -71,8 +68,8 @@ module Eprime
         return data
       end
       
-      def top_frames
-        return frames.find_all { |frame| frame.level == @top_level }
+      def leaf_frames
+        return frames.find_all { |frame| frame.leaf? }
       end
       
       # Define this as a column we *should not* include in out output.
@@ -102,7 +99,6 @@ module Eprime
           if !in_frame
             if key == LEVEL_KEY
               frame.level = val.to_i
-              @top_level = frame.level if frame.level > @top_level
             elsif key == FRAME_START
               in_frame = true
             end
@@ -166,6 +162,8 @@ module Eprime
       def set_parents!
         parents = []
         @frames.reverse_each do |frame|
+          child = parents[frame.level-1]
+          
           parents[frame.level] = frame
           frame.parent = parents[frame.level-1] # This will be nil for empty slots.
         end
@@ -176,11 +174,27 @@ module Eprime
         
         attr_accessor :level
         attr_accessor :parent
+        attr_accessor :children
         def initialize(parser)
           @level = nil
           @parent = nil
+          @children = []
           @data = Hash.new
           @parser = parser
+        end
+        
+        def parent=(new_parent)
+          if @parent
+            if new_parent != @parent
+              @parent.children.delete(self)
+            end
+          end
+          @parent = new_parent
+          @parent.children << self if @parent
+        end
+        
+        def leaf?
+          @children.empty?
         end
         
         # Methods to make this behave hashlike. Don't just delegate to 

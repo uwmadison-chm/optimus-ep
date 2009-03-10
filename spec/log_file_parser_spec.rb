@@ -27,16 +27,16 @@ describe Eprime::Reader::LogfileParser do
       @reader.frames.detect{ |c| c.keys.size == 0}.should be_nil
     end
   
-    it "should have a level 3 frame at the start" do
-      @reader.frames.first.level.should == 3
+    it "should have a level 2 frame at the start" do
+      @reader.frames.first.level.should == 2
     end
   
     it "should have a level 1 frame at the end" do
       @reader.frames.last.level.should == 1
     end
   
-    it "should have a known TypeA key in first frame" do
-      @reader.frames.first["TypeA"].should_not be_nil
+    it "should have a known BlockTitle key in first frame" do
+      @reader.frames.first["BlockTitle"].should_not be_nil
     end
   
     it "should not have a known Gibberish key in first frame" do
@@ -55,12 +55,8 @@ describe Eprime::Reader::LogfileParser do
       @reader.levels.should include("Session")
     end
     
-    it "should find a top_level of 3" do
-      @reader.top_level.should == 3
-    end
-    
-    it "should have three top frames" do
-      @reader.top_frames.length.should == 3
+    it "should have four leaves" do
+      @reader.leaf_frames.length.should == 4
     end
   
     it "should have a parent in the first frame" do
@@ -72,8 +68,8 @@ describe Eprime::Reader::LogfileParser do
         @eprime = @reader.to_eprime
       end
     
-      it "should generate three rows from the example file" do
-        @eprime.length.should == 3
+      it "should generate four rows from the example file" do
+        @eprime.length.should == 4
       end
       
       it "should follow the column order in the example file" do
@@ -105,7 +101,7 @@ describe Eprime::Reader::LogfileParser do
     
       it "should compute task counters" do
         @eprime.first["Block"].should == 1
-        @eprime.last["Block"].should == 2
+        @eprime.last["Block"].should == 3
         @eprime.last["Trial"].should == 2
       end
     
@@ -131,8 +127,8 @@ describe Eprime::Reader::LogfileParser do
       @eprime.columns.first.should == "ExperimentName"
     end
     
-    it "should have three rows" do
-      @eprime.length.should == 3
+    it "should have four rows" do
+      @eprime.length.should == 4
     end
     
     
