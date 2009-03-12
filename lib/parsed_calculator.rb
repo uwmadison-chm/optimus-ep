@@ -23,11 +23,17 @@ module Eprime
       include RParsec::Parsers
 
       def initialize
+        @operators = RParsec::Operators.new(%w{+ -})
+        
         lit = (
           token(:str) { |lex| StringLiteral.new(lex) } |
           token(:number) { |lex| NumberLiteral.new(lex) } |
           token(:column) { |lex| ColumnReference.new(lex) } )
-        table = RParsec::OperatorTable.new
+        
+        table = RParsec::OperatorTable.new.
+          infixl(@operators['+'] >> lambda {|a, b| a+b}, 10).
+          infixl(@operators['-'] >> lambda {|a, b| a-b}, 10)
+        
         expr = RParsec::Expressions.build(lit, table)
         
         lexeme = tokenizer.lexeme(whitespaces) << eof
@@ -44,7 +50,8 @@ module Eprime
         return (
           string_literal.token(:str) |
           number.token(:number) |
-          column_reference.token(:column)
+          column_reference.token(:column) |
+          @operators.lexer
         )
       end
       
@@ -57,7 +64,31 @@ module Eprime
       end
     end
     
-    class NumberLiteral
+    class Expr
+      # All of our literals, etc will ineherit from Expr. This will imbue
+      # them with the magic to work with our unary and binary operators.
+      BINARY_OPERATORS=[:+, :-]
+      BINARY_OPERATORS.each do |op|
+        define_method(op) { |other|
+          return BinaryExpr.new(self, op, other)
+        }
+      end
+    end
+
+    class BinaryExpr < Expr
+      attr_reader :left, :op, :right
+      def initialize(left, op, right)
+        @left = left
+        @op = op
+        @right = right
+      end
+      
+      def to_s
+        "(#{left} #{op} #{right})"
+      end
+    end
+    
+    class NumberLiteral < Expr
       def initialize(token)
         @token = token
       end
@@ -67,7 +98,7 @@ module Eprime
       end
     end
     
-    class StringLiteral
+    class StringLiteral < Expr
       def initialize(token)
         @token = token
       end
@@ -77,7 +108,7 @@ module Eprime
       end
     end
     
-    class ColumnReference
+    class ColumnReference < Expr
       def initialize(name)
         @name = name
       end

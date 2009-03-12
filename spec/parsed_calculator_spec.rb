@@ -47,4 +47,31 @@ describe Eprime::ParsedCalculator::ExpressionParser do
   it "should parse column names with \\} included" do
     @exp.should round_trip('{foo\}bar}')
   end
+  
+  it "should parse + as binary operator with numbers" do
+    @exp.should parse_as('1 + 1', '(1 + 1)')
+  end
+  
+  it "should parse + as a binary operator without spaces" do
+    @exp.should parse_as("1+1", "(1 + 1)")
+  end
+  
+  it "should parse + as binary operator with strings" do
+    @exp.should parse_as("'a' + 1", "('a' + 1)")
+  end
+  
+  it "should parse + as binary operator with columns" do
+    @exp.should parse_as("{foo} + 1", "({foo} + 1)")
+  end
+  
+  it "should left-associatively group with +" do
+    @exp.should parse_as("1 + 1 + 1", "((1 + 1) + 1)")
+  end
+  
+  # We've done all the complex tests with + -- another associative binary
+  # operator. I'm assuming the others work as well.
+  it "should parse - as a binary operator" do
+    @exp.should parse_as("1 - 1", "(1 - 1)")
+  end
+  
 end
