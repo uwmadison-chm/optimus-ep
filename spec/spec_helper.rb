@@ -7,27 +7,32 @@
 
 module EprimeTestHelper
   
-  class RoundTrip
-    def initialize(expected)
+  class ParseAs
+    def initialize(parse_str, expected)
+      @parse_str = parse_str
       @expected = expected
     end
     
     def matches?(target)
-      @parsed = target.parse(@expected).to_s
-      @parsed == @expected
+      @parsed = target.parse(@parse_str).to_s
+      return (@parsed == @expected)
     end
     
     def failure_message
-      "expected #{@parsed} to parse to #{@expected}"
+      "expected #{@parse_str} to parse to #{@expected}, got #{@parsed}"
     end
     
     def negative_failure_message
-      "Expected #{@parsed} to not parse to #{@expected}"
+      "expected #{@parse_str} not to parse to #{@expected}."
     end
   end
   
+  def parse_as(parse_str, expected)
+    ParseAs.new(parse_str, expected)
+  end
+  
   def round_trip(expected)
-    RoundTrip.new(expected)
+    ParseAs.new(expected, expected)
   end
   
   class ParseSuccessfully
