@@ -23,16 +23,23 @@ module Eprime
       include RParsec::Parsers
 
       def initialize
-        @operators = RParsec::Operators.new(%w{+ -})
-        
-        lit = (
+        @operators = RParsec::Operators.new(%w{+ - * / & ( )})
+        expr = nil
+        lazy_expr = lazy { expr }
+        atom = (
           token(:str) { |lex| StringLiteral.new(lex) } |
           token(:number) { |lex| NumberLiteral.new(lex) } |
           token(:column) { |lex| ColumnReference.new(lex) } )
         
+        lit = atom | (@operators['('] >> lazy_expr << @operators[')'])
+        
         table = RParsec::OperatorTable.new.
+          prefix(@operators['-'] >> lambda {|a| -a}, 50).
+          infixl(@operators['*'] >> lambda {|a, b| a*b}, 30).
+          infixl(@operators['/'] >> lambda {|a, b| a/b}, 30).
           infixl(@operators['+'] >> lambda {|a, b| a+b}, 10).
-          infixl(@operators['-'] >> lambda {|a, b| a-b}, 10)
+          infixl(@operators['-'] >> lambda {|a, b| a-b}, 10).
+          infixl(@operators['&'] >> lambda {|a, b| a.concat(b)},5) #dishwasher
         
         expr = RParsec::Expressions.build(lit, table)
         
@@ -67,11 +74,19 @@ module Eprime
     class Expr
       # All of our literals, etc will ineherit from Expr. This will imbue
       # them with the magic to work with our unary and binary operators.
-      BINARY_OPERATORS=[:+, :-]
+      BINARY_OPERATORS=[:+, :-, :*, :/]
       BINARY_OPERATORS.each do |op|
         define_method(op) { |other|
           return BinaryExpr.new(self, op, other)
         }
+      end
+      
+      def concat(other)
+        return BinaryExpr.new(self, :&, other)
+      end
+      
+      def -@
+        return PrefixExpr.new(:-, self)
       end
     end
 
@@ -84,7 +99,19 @@ module Eprime
       end
       
       def to_s
-        "(#{left} #{op} #{right})"
+        "(#{@left} #{@op} #{@right})"
+      end
+    end
+    
+    class PrefixExpr < Expr
+      attr_reader :op, :right
+      def initialize(op, right)
+        @op = op
+        @right = right
+      end
+      
+      def to_s
+        "#{@op}(#{@right})"
       end
     end
     

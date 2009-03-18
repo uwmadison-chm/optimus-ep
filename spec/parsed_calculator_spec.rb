@@ -68,10 +68,48 @@ describe Eprime::ParsedCalculator::ExpressionParser do
     @exp.should parse_as("1 + 1 + 1", "((1 + 1) + 1)")
   end
   
+  it "should parse with specified grouping" do
+    @exp.should parse_as("1 + (1 + 1)", "(1 + (1 + 1))")
+  end
+  
   # We've done all the complex tests with + -- another associative binary
   # operator. I'm assuming the others work as well.
   it "should parse - as a binary operator" do
     @exp.should parse_as("1 - 1", "(1 - 1)")
+  end
+  
+  it "should parse * as binary operator" do
+    @exp.should round_trip('(2 * 2)')
+  end
+  
+  it "should give * higher precedence than +" do
+    @exp.should parse_as("1 + 1 * 1", "(1 + (1 * 1))")
+  end
+  
+  it "should give * higher precedence than binary -" do
+    @exp.should parse_as("1 - 1 * 1", "(1 - (1 * 1))")
+  end
+  
+  it "should parse / as binary operator" do
+    @exp.should round_trip("(1 / 1)")
+  end
+  
+  it "should give / the same precedence as *" do
+    # This means we'll just use left-associtivity rules...
+    @exp.should parse_as("1 / 1 * 1", "((1 / 1) * 1)")
+    @exp.should parse_as("1 * 1 / 1", "((1 * 1) / 1)")
+  end
+  
+  it "should parse - as a unary prefix operator" do
+    @exp.should parse_as("-1", "-(1)")
+  end
+  
+  it "should give negation higher precedence than *" do
+    @exp.should parse_as("-1*1", "(-(1) * 1)")
+  end
+  
+  it "should parse & as a binary operator" do
+    @exp.should round_trip("('a' & 'b')")
   end
   
 end
