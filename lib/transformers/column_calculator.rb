@@ -6,7 +6,7 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require 'calculator'
-
+require 'parsed_calculator'
 module Eprime
   module Transformers
 
@@ -39,6 +39,7 @@ module Eprime
         end
         # The name 'sorter' is never used; it's just an arbitrary placeholder
         @sorter = ComputedColumn.new('sorter', Expression.new('1'))
+        #@parser = ParsedCalculator::ExpressionParser.new
       end
     
       # Makes this into a static Eprime::Data object
@@ -95,7 +96,8 @@ module Eprime
       end
     
       def sort_expression=(expr)
-        # The name 'sorter' is utterly arbitrary and never used
+        # The name 'sorter' is utterly arbitrary and never used. It is also
+        # not exposed.
         @sorter = ComputedColumn.new('sorter', Expression.new(expr))
         @computed = nil
       end
@@ -154,6 +156,12 @@ module Eprime
       # because copydown and counter columns depend on the values of previous
       # rows.
       def compute_data!
+        #TODO: Parse all the computed columns
+        @computed_cols.each do |cc|
+          if !cc.expression.expr.respond_to? :call
+            #cc.expression.parse_tree = @parser.parse(cc.expression.to_s)
+          end
+        end
         @computed = Eprime::Data.new(columns)
         @data.each_index do |i|
           row = Row.new(self, @data[i])
@@ -221,7 +229,8 @@ module Eprime
       end
     
       class ComputedColumn < Column
-      
+        attr_reader :expression
+        
         def initialize(name, expression)
           @expression = expression
           super(name)
@@ -234,6 +243,8 @@ module Eprime
         end
       
         def compute_without_check(row, path = [])
+          # TODO: Gut this method.
+      
           compute_str = @expression.to_s
           if path.include?(@name) 
             raise ComputationError.new("#{compute_str} contains a loop with #{@name} -- can't compute")
@@ -354,6 +365,7 @@ module Eprime
       class Expression
         attr_reader :columns
         attr_reader :expr
+        attr_accessor :parse_tree
       
         COLUMN_FINDER = /\{([^}]*)\}/ # Finds strings like {foo} and {bar}
         def initialize(expr_string)

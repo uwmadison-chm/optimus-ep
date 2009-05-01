@@ -62,18 +62,27 @@ describe Eprime::Transformers::Multipasser do
       end
     end
     
-    it "should sort multiple passes together" do
+    it "should allow multiple passes" do
+      pending
       pass = @mpass.add_pass("{fix_time}")
       pass.computed_column "presented_time", "{fix_time}"
-      pass.computed_column "presented_name", "fixation"
-      pass = @mpass.add_pass("{stim_time}")
-      pass.computed_column "presented_time", "{stim_time}"
-      pass.computed_column "presented_name", "stimulus"
-      @mpass.to_a.size.should == @data.size*2
-      ps = @mpass.to_a.sort_by{|row| row['presented_time'].to_f}
-      @mpass.to_a.each_index do |i|
-        @mpass[i]['presented_time'].to_s.should == ps[i]['presented_time'].to_s
-      end
+      pass.computed_column "presented_name", "'fixation'"
+      @mpass.to_a.size.should == @data.size
+    end
+    
+    it "should sort multiple passes together" do
+      pending
+      #pass = @mpass.add_pass("{fix_time}")
+      #pass.computed_column "presented_time", "{fix_time}"
+      #pass.computed_column "presented_name", "fixation"
+      #pass = @mpass.add_pass("{stim_time}")
+      #pass.computed_column "presented_time", "{stim_time}"
+      #pass.computed_column "presented_name", "stimulus"
+      #@mpass.to_a.size.should == @data.size*2
+      #ps = @mpass.to_a.sort_by{|row| row['presented_time'].to_f}
+      #@mpass.to_a.each_index do |i|
+      #  @mpass[i]['presented_time'].to_s.should == ps[i]['presented_time'].to_s
+      #end
     end
     
     it "should work with multiple arguments in constructor" do

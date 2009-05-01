@@ -29,7 +29,7 @@ describe Eprime::ParsedCalculator::ExpressionParser do
   end
     
   it "should parse single-quoted strings" do
-    @exp.should round_trip("'foo'")
+    @exp.should round_trip("'fixation'")
   end
   
   it "should parse strings with two single-quotes as one single-quote" do

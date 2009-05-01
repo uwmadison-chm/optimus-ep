@@ -39,7 +39,7 @@ module Eprime
           infixl(@operators['/'] >> lambda {|a, b| a/b}, 30).
           infixl(@operators['+'] >> lambda {|a, b| a+b}, 10).
           infixl(@operators['-'] >> lambda {|a, b| a-b}, 10).
-          infixl(@operators['&'] >> lambda {|a, b| a.concat(b)},5) #dishwasher
+          infixl(@operators['&'] >> lambda {|a, b| a.concat(b)},5)
         
         expr = RParsec::Expressions.build(lit, table)
         
@@ -48,7 +48,12 @@ module Eprime
       end
       
       def parse(str)
-        @parser.parse(str)
+        begin
+          @parser.parse(str)
+        rescue Exception
+          puts "Failed on #{str}"
+          raise
+        end
       end
       
       private

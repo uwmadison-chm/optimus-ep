@@ -163,6 +163,11 @@ describe Eprime::Transformers::ColumnCalculator do
       @calc[0]["always_1"].should == "1"
     end
     
+    it "should allow setting a string value in a column" do
+      @calc.computed_column "foo_str", "foo"
+      @calc[0]["foo_str"].should == "foo"
+    end
+    
     it "should compute on single rows with some math" do
       @calc.computed_column "test", "(3+2)*4"
       @calc[0]["test"].should == ((3+2)*4).to_s
