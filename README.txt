@@ -27,7 +27,7 @@ FIX (describe your package)
 (The GNU Public License, Version 2)
 
 Optimus: Libraries and utilities for interacting with E-Prime data files
-Copyright (C) 2008 Board of Regents of the University of Wisconsin System
+Copyright (C) 2008-09 Board of Regents of the University of Wisconsin System
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of version 2 of the GNU General Public
