@@ -6,7 +6,6 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require 'calculator'
-require 'parsed_calculator'
 module Eprime
   module Transformers
 
@@ -39,7 +38,6 @@ module Eprime
         end
         # The name 'sorter' is never used; it's just an arbitrary placeholder
         @sorter = ComputedColumn.new('sorter', Expression.new('1'))
-        #@parser = ParsedCalculator::ExpressionParser.new
       end
     
       # Makes this into a static Eprime::Data object

@@ -24,15 +24,15 @@ describe Eprime::Calculator do
     @calc.compute(es(:str_const)).should == ev(:str_const)
   end
   
-  it "should allow string concatentation" #do
-  #  @calc.compute(es(:str_cat)).should == ev(:str_cat)
-  #end
+  it "should allow string concatentation" do
+    @calc.compute(es(:str_cat)).should == ev(:str_cat)
+  end
 
-  it "should not allow concatenating numbers with strings" #do
-  #  lambda {
-  #    @calc.compute("1 + a")
-  #  }.should raise_error
-  #end
+  it "should not allow concatenating numbers with strings" do
+    lambda {
+      @calc.compute("1 + a")
+    }.should raise_error
+  end
   
   it "should add" do
     @calc.compute(es(:add)).should == ev(:add)
@@ -62,9 +62,9 @@ describe Eprime::Calculator do
     @calc.compute(es(:mod)).should == ev(:mod)
   end
   
-  it "should fail with infix garbage" #do
-  #  lambda {
-  #    @calc.compute("1 broken 2")
-  #  }.should raise_error(RParsec::ParserException)
-  #end
+  it "should fail with infix garbage" do
+    lambda {
+      @calc.compute("1 broken 2")
+    }.should raise_error(RParsec::ParserException)
+  end
 end

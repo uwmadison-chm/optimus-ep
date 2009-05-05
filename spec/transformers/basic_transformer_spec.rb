@@ -49,23 +49,21 @@ describe Eprime::Transformers::BasicTransformer do
   end
   
   it "should allow adding simple passes without a block" do
-    pending
-    #@xf.add_pass(
-    #  '-{stim_time}', 
-    #  lambda {|r| !r['sparse'].to_s.empty?}, 
-    #  [['test', 'stim_time']]
-    #)
-    #df = @data.find_all { |r| !r['sparse'].to_s.empty? }
-    #@xf.size.should == df.size
+    @xf.add_pass(
+      '-{stim_time}', 
+      lambda {|r| !r['sparse'].to_s.empty?}, 
+      [['test', 'stim_time']]
+    )
+    df = @data.find_all { |r| !r['sparse'].to_s.empty? }
+    @xf.size.should == df.size
   end
   
   it "should allow adding passes without a block" do
-    #@xf.add_pass('-{stim_time}', lambda {|r| !r['sparse'].to_s.empty?}, [['test', 'stim_time']])
-    #df = @data.find_all { |r| !r['sparse'].to_s.empty? }
-    #@xf.size.should == df.size
-    #@xf[0]['stim_time'].should == df.reverse[0]['stim_time']
-    #@xf.columns.should include('test')
-    pending
+    @xf.add_pass('-{stim_time}', lambda {|r| !r['sparse'].to_s.empty?}, [['test', 'stim_time']])
+    df = @data.find_all { |r| !r['sparse'].to_s.empty? }
+    @xf.size.should == df.size
+    @xf[0]['stim_time'].should == df.reverse[0]['stim_time']
+    @xf.columns.should include('test')
   end
   
   it 'should allow adding passes with a block' do

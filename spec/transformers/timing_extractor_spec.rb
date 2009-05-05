@@ -22,10 +22,9 @@ describe Eprime::Transformers::TimingExtractor do
   end
   
   it "should accept extract_stimulus" do
-    pending
-    #lambda { 
-    #  @tx.extract_stimulus('stim_time', 'stim_time', 'stim_time') 
-    #}.should_not raise_error
+    lambda { 
+      @tx.extract_stimulus('stim_time', 'stim_time', 'stim_time') 
+    }.should_not raise_error
   end
   
   it "should have nothing in extracted_data when no stimuli are extracted" do
@@ -33,10 +32,9 @@ describe Eprime::Transformers::TimingExtractor do
   end
   
   it "should return rows when extracting stim_time" do
-    pending
     # These results will not be very meaningful
-    #@tx.extract_stimulus('stim_time', 'stim_time', 'stim_time') 
-    #@tx.extracted_data.size.should == @data.size
+    @tx.extract_stimulus('stim_time', 'stim_time', 'stim_time') 
+    @tx.extracted_data.size.should == @data.size
   end
   
   it "should accept columns" do
@@ -44,54 +42,49 @@ describe Eprime::Transformers::TimingExtractor do
   end
   
   it "should extract from computed columns" do
-    pending
-    #@tx.computed_column 'foo', "'a'"
-    #@tx.columns.should include('foo')
-    ##@tx.extract_stimulus('foo', 'foo', 'foo')
-    #@tx.extracted_data.size.should == @data.size
+    @tx.computed_column 'foo', "a"
+    @tx.columns.should include('foo')
+    @tx.extract_stimulus('foo', 'foo', 'foo')
+    @tx.extracted_data.size.should == @data.size
   end
   
   it "should honor row filters in stim extraction" do
-    pending
-    #@tx.extract_stimulus(
-    #  'stim_time', 
-    #  'stim_time', 
-    #  'stim_time',
-    #  lambda {|row| !row['sparse'].to_s.empty? }
-    #)
-    #count = @data.find_all { |r| !r['sparse'].to_s.empty? }.size
-    #@tx.extracted_data.size.should == count
+    @tx.extract_stimulus(
+      'stim_time', 
+      'stim_time', 
+      'stim_time',
+      lambda {|row| !row['sparse'].to_s.empty? }
+    )
+    count = @data.find_all { |r| !r['sparse'].to_s.empty? }.size
+    @tx.extracted_data.size.should == count
   end
   
   describe "(extracting two stimuli)" do
     before :each do
       @data = mock_edata
       @tx = TimingExtractor.new(@data)
-      @tx.computed_column('stim_name',"'stim'")
-      @tx.computed_column('fix_name', "'fixation'")
+      @tx.computed_column('stim_name',"stim")
+      @tx.computed_column('fix_name', "fixation")
       @tx.computed_column('stim_offset', '{stim_time} + 500 - {run_start}')
       @tx.computed_column('fix_offset', '{fix_time}+130-{run_start}')
-      #@tx.extract_stimulus('stim_name', 'stim_time', 'stim_time')
-      #@tx.extract_stimulus('fix_name', 'fix_time', 'fix_offset')
+      @tx.extract_stimulus('stim_name', 'stim_time', 'stim_time')
+      @tx.extract_stimulus('fix_name', 'fix_time', 'fix_offset')
       @ed = @tx.extracted_data
     end
     
     it "should have columns presented, onset, and offset" do
-      pending
-      #@ed.columns.should == %w(presented onset offset)
+      @ed.columns.should == %w(presented onset offset)
     end
     
     it "should have twice as many rows as @data" do
-      pending
-      #@ed.size.should == @data.size*2
+      @ed.size.should == @data.size*2
     end
     
     it "should be ordered by onset" do
-      pending
-      #ordered = @ed.sort_by { |r| r['onset'].to_f }
-      #ordered.each_index do |i|
-      #  ordered[i]['onset'].to_s.should == @ed[i]['onset'].to_s
-      #end
+      ordered = @ed.sort_by { |r| r['onset'].to_f }
+      ordered.each_index do |i|
+        ordered[i]['onset'].to_s.should == @ed[i]['onset'].to_s
+      end
     end
   end
 end
