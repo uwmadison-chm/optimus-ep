@@ -52,7 +52,6 @@ module Eprime
         begin
           @parser.parse(str)
         rescue Exception
-          puts "Failed on #{str}"
           raise
         end
       end

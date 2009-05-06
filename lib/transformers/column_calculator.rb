@@ -21,8 +21,6 @@ module Eprime
     # like the computed columns' parser is really needed.
   
     class ColumnCalculator
-      attr_writer :data
-      attr_reader :columns
     
       COLUMN_TYPES = %w(data_cols computed_cols copydown_cols counter_cols)
       include Enumerable
