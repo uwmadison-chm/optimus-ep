@@ -29,6 +29,24 @@ module Eprime
     end
 
     class BinaryExpr < Expr
+      
+      EVAL_TABLE = {
+        :+ => lambda { |lval, rval|
+          if lval.kind_of? Numeric and rval.kind_of? Numeric
+            return lval+rval
+          else
+            return "NaN"
+          end
+        },
+        :- => lambda { |lval, rval|
+          if lval.kind_of? Numeric and rval.kind_of? Numeric
+            return lval-rval
+          else
+            return "NaN"
+          end
+        },
+      }
+      
       attr_reader :left, :op, :right
       def initialize(left, op, right)
         @left = left
@@ -38,6 +56,12 @@ module Eprime
   
       def to_s
         "(#{@left} #{@op} #{@right})"
+      end
+      
+      def evaluate(*args)
+        lval = @left.evaluate(*args)
+        rval = @right.evaluate(*args)
+        return EVAL_TABLE[@op].call(lval, rval)
       end
     end
 
@@ -51,6 +75,17 @@ module Eprime
       def to_s
         "#{@op}(#{@right})"
       end
+      
+      def evaluate(*args)
+        table = {
+          :- => lambda {|val| 
+            return -val if val.kind_of? Numeric
+            return "NaN"
+          }
+        }
+        right_value = @right.evaluate(*args)
+        return table[@op].call(right_value)
+      end
     end
 
     class NumberLiteral < Expr
@@ -61,15 +96,24 @@ module Eprime
       def to_s
         @token
       end
+      
+      def evaluate(*args)
+        @token.to_f
+      end
     end
 
     class StringLiteral < Expr
+      
       def initialize(token)
         @token = token
       end
   
       def to_s
         "'#{@token}'"
+      end
+      
+      def evaluate(*args)
+        @token
       end
     end
 

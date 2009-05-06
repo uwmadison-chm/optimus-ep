@@ -63,6 +63,30 @@ module EprimeTestHelper
     ParseSuccessfully.new(expected)
   end
   
+  class EvaluateAs
+    def initialize(expected)
+      @expected = expected
+    end
+    
+    def matches?(target)
+      @target = target
+      @result = target.evaluate
+      return @result == @expected
+    end
+    
+    def failure_message
+      "#{@target.to_s} expected to evaluate to #{@expected.inspect}; actual: #{@result.inspect}"
+    end
+
+    def negative_failure_message
+      "#{@target.to_s} expected to NOT evaluate to #{@expected}"
+    end
+  end
+  
+  def evaluate_to(expected)
+    EvaluateAs.new(expected)
+  end
+  
   unless constants.include?('SAMPLE_DIR')
     SAMPLE_DIR = File.join(File.dirname(__FILE__), 'samples')
     LOG_FILE = File.join(SAMPLE_DIR, 'optimus_log.txt')
