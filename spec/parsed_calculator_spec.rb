@@ -112,4 +112,8 @@ describe Eprime::ParsedCalculator::ExpressionParser do
     @exp.should round_trip("('a' & 'b')")
   end
   
+  it "should parse % as a binary operator" do
+    @exp.should round_trip("(5 % 3)")
+  end
+  
 end

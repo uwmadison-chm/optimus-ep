@@ -63,7 +63,7 @@ module EprimeTestHelper
     ParseSuccessfully.new(expected)
   end
   
-  class EvaluateAs
+  class EvaluateTo
     def initialize(expected)
       @expected = expected
     end
@@ -71,7 +71,7 @@ module EprimeTestHelper
     def matches?(target)
       @target = target
       @result = target.evaluate
-      return @result == @expected
+      return ((@result == @expected) or (is_NaN(@result) and is_NaN(@expected)))
     end
     
     def failure_message
@@ -81,10 +81,15 @@ module EprimeTestHelper
     def negative_failure_message
       "#{@target.to_s} expected to NOT evaluate to #{@expected}"
     end
+    
+    private
+    def is_NaN(obj)
+      obj.respond_to? :nan? and obj.nan?
+    end
   end
   
   def evaluate_to(expected)
-    EvaluateAs.new(expected)
+    EvaluateTo.new(expected)
   end
   
   unless constants.include?('SAMPLE_DIR')

@@ -24,7 +24,7 @@ module Eprime
       include RParsec::Parsers
 
       def initialize
-        @operators = RParsec::Operators.new(%w{+ - * / & ( )})
+        @operators = RParsec::Operators.new(%w{+ - * / % & ( )})
         expr = nil
         lazy_expr = lazy { expr }
         atom = (
@@ -38,9 +38,10 @@ module Eprime
           prefix(@operators['-'] >> lambda {|a| -a}, 50).
           infixl(@operators['*'] >> lambda {|a, b| a*b}, 30).
           infixl(@operators['/'] >> lambda {|a, b| a/b}, 30).
+          infixl(@operators['%'] >> lambda {|a, b| a%b}, 30).
           infixl(@operators['+'] >> lambda {|a, b| a+b}, 10).
           infixl(@operators['-'] >> lambda {|a, b| a-b}, 10).
-          infixl(@operators['&'] >> lambda {|a, b| a.concat(b)},5)
+          infixl(@operators['&'] >> lambda {|a, b| a&b},5)
         
         expr = RParsec::Expressions.build(lit, table)
         

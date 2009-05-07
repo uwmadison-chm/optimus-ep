@@ -6,21 +6,19 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 #
 # Expressions for the ParsedCalculator
+require 'expression_parser/evaluators'
 
 module Eprime
   module ParsedCalculator
+    NaN = 0.0/0.0
     class Expr
       # All of our literals, etc will ineherit from Expr. This will imbue
       # them with the magic to work with our unary and binary operators.
-      BINARY_OPERATORS=[:+, :-, :*, :/]
+      BINARY_OPERATORS=[:+, :-, :*, :/, :%, :&]
       BINARY_OPERATORS.each do |op|
         define_method(op) { |other|
           return BinaryExpr.new(self, op, other)
         }
-      end
-  
-      def concat(other)
-        return BinaryExpr.new(self, :&, other)
       end
   
       def -@
@@ -29,23 +27,7 @@ module Eprime
     end
 
     class BinaryExpr < Expr
-      
-      EVAL_TABLE = {
-        :+ => lambda { |lval, rval|
-          if lval.kind_of? Numeric and rval.kind_of? Numeric
-            return lval+rval
-          else
-            return "NaN"
-          end
-        },
-        :- => lambda { |lval, rval|
-          if lval.kind_of? Numeric and rval.kind_of? Numeric
-            return lval-rval
-          else
-            return "NaN"
-          end
-        },
-      }
+      include Evaluators::Binary
       
       attr_reader :left, :op, :right
       def initialize(left, op, right)
@@ -61,11 +43,12 @@ module Eprime
       def evaluate(*args)
         lval = @left.evaluate(*args)
         rval = @right.evaluate(*args)
-        return EVAL_TABLE[@op].call(lval, rval)
+        return OpTable[@op].call(lval, rval)
       end
     end
 
     class PrefixExpr < Expr
+      include Evaluators::Prefix
       attr_reader :op, :right
       def initialize(op, right)
         @op = op
@@ -77,14 +60,8 @@ module Eprime
       end
       
       def evaluate(*args)
-        table = {
-          :- => lambda {|val| 
-            return -val if val.kind_of? Numeric
-            return "NaN"
-          }
-        }
-        right_value = @right.evaluate(*args)
-        return table[@op].call(right_value)
+        rval = @right.evaluate(*args)
+        return OpTable[@op].call(rval)
       end
     end
 

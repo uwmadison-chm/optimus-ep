@@ -11,6 +11,8 @@ require 'parsed_calculator'
 
 include EprimeTestHelper
 
+NaN = 0.0/0.0
+
 describe Eprime::ParsedCalculator::ExpressionParser do
   before :all do
     @exp = Eprime::ParsedCalculator::ExpressionParser.new
@@ -38,7 +40,7 @@ describe Eprime::ParsedCalculator::ExpressionParser do
     
     it "should return NaN when negating strings" do
       px = @exp.parse("-'a'")
-      px.should evaluate_to("NaN")
+      px.should evaluate_to(NaN)
     end
   end
   
@@ -55,14 +57,37 @@ describe Eprime::ParsedCalculator::ExpressionParser do
 
     it "should not add strings" do
       bx = @exp.parse("1+'a'")
-      bx.should evaluate_to("NaN")
+      bx.should evaluate_to(NaN)
     end
     
     it "should subtract numbers" do
       bx = @exp.parse("2-1")
       bx.should evaluate_to(1)
-      
     end
 
+    it "should not subtract strings" do
+      bx = @exp.parse("1-'a'")
+      bx.should evaluate_to(NaN)
+    end
+    
+    it "should multiply numbers" do
+      bx = @exp.parse("2*2")
+      bx.should evaluate_to(4)
+    end
+    
+    it "should divide numbers" do
+      bx = @exp.parse("4/2")
+      bx.should evaluate_to(2)
+    end
+    
+    it "should concatenate strings" do
+      bx = @exp.parse("'foo' & 'bar'")
+      bx.should evaluate_to("foobar")
+    end
+    
+    it "should mod numbers" do
+      bx = @exp.parse("5 % 3")
+      bx.should evaluate_to(2)
+    end
   end
 end
