@@ -40,8 +40,21 @@ describe Eprime::Transformers::ParsedColumnCalculator do
     @pc.columns.should include(NEW_COLUMN)
   end
   
+  it "should raise an error when adding bad columns" do
+    lambda {
+      @pc.computed_column NEW_COLUMN, "FIAL"
+    }.should raise_error(RParsec::ParserException)
+  end
+  
   it "should bring forth existing data" do
     col = @edata.columns[0]
     @pc.map {|row| row[col]}.should == @edata.map {|row| row[col]}
+  end
+  
+  it "should return values for columns based on literals" do
+    @pc.computed_column NEW_COLUMN, "1"
+    @pc.each do |row|
+      row[NEW_COLUMN].should == 1
+    end
   end
 end

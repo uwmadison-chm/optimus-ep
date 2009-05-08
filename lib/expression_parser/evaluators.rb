@@ -32,6 +32,9 @@ module Eprime
         }
       end # module Prefix
 
+      # Actual functions to evaluate binary expressions such as
+      # 1+1 and 5%3.
+      # Here is where we get to say what our operators actually do!
       module Binary
         Plus = lambda {|lval, rval|
           return lval+rval if Evaluators.all_num?(lval, rval)

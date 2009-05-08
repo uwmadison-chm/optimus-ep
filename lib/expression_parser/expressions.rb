@@ -102,6 +102,10 @@ module Eprime
       def to_s
         "{#{@name}}"
       end
+      
+      def evaluate(*args)
+        
+      end
     end
   end
 end
