@@ -104,8 +104,36 @@ module Eprime
       end
       
       def evaluate(*args)
+        options = args.last || {}
+        row = options[:row] || {}
+        computed_columns = options[:computed_columns] || {}
+        seen_columns = options[:seen_columns] || []
+        if seen_columns.include?(@name)
+          raise EvaluationLoopError.new(
+            "Loop error - #{@name} depends on itself: [#{seen_columns.join(', ')}]"
+          )
+        end
         
+        if !row[@name] and computed_columns.include?(@name)
+          row[@name] = computed_columns[@name].evaluate(
+            :row => row, 
+            :computed_columns => computed_columns,
+            :seen_columns => ([@name] + seen_columns)
+          )
+        end
+        return magic_cast(row[@name])
       end
-    end
+      
+      private
+      def magic_cast(value)
+        new_val = value.to_s.strip
+        new_val = new_val.to_f if numlike?(new_val)
+        return new_val
+      end
+      
+      def numlike?(value)
+        value.to_s =~ /^-?\d+\.?\d*$/
+      end
+    end # class ColumnReference
   end
 end

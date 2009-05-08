@@ -52,6 +52,10 @@ module Eprime
         computed_data.each(&block)
       end
       
+      def [](index)
+        computed_data[index]
+      end
+      
       private
       
       def reset!
@@ -64,10 +68,17 @@ module Eprime
         @computed_data.merge!(@data)
         @computed_data.each do |row|
           @computed_column_names.each do |col|
-            row[col] = @computed_columns[col].evaluate
+            row[col] = @computed_columns[col].evaluate(
+              :row => row, :computed_columns => @computed_columns
+            )
           end
         end
       end
-    end    
+      
+      class ComputedColumn
+        def initialize(name, parsed_expr)
+        end
+      end # class ComputedColumn
+    end # class ParsedColumnCalculator
   end
 end

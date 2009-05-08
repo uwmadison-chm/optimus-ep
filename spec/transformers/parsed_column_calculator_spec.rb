@@ -57,4 +57,34 @@ describe Eprime::Transformers::ParsedColumnCalculator do
       row[NEW_COLUMN].should == 1
     end
   end
+  
+  it "should return computed columns based on literal columns" do
+    @pc.computed_column NEW_COLUMN, "{stim_time}"
+    @pc.each do |row|
+      row[NEW_COLUMN].should == row['stim_time'].to_f
+    end
+  end
+  
+  it "should return computed columns based on other computed columns" do
+    @pc.computed_column "FOO2", "{#{NEW_COLUMN}}"
+    @pc.computed_column NEW_COLUMN, "{stim_time}"
+    @pc.each do |row|
+      row["FOO2"].should == row['stim_time'].to_f
+    end
+  end
+  
+  it "should raise a loop error when detecting a loop" do
+    @pc.computed_column "nc1", "{nc2}"
+    @pc.computed_column "nc2", "{nc1}"
+    lambda {
+      @pc[0]
+    }.should raise_error(Eprime::EvaluationLoopError)
+  end
+  
+  it "should pass a somewhat arbitrary test" do
+    @pc.computed_column "result", "{stim_time} + 100 / 2"
+    @pc.each do |row|
+      row['result'].should == (row['stim_time'].to_f + 100 / 2)
+    end
+  end
 end

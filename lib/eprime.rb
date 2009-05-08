@@ -15,10 +15,15 @@ require 'eprime_reader'
 
 module Eprime
 
+  class Error < RuntimeError; end
+
   # Raised whenever an input file's type can't be detemined by Eprime::Reader
-  class UnknownTypeError < Exception; end
+  class UnknownTypeError < Error; end
   
   # Raised whenever an input file seems to be damaged
-  class DamagedFileError < Exception; end
+  class DamagedFileError < Error; end
+  
+  # Raised when a parse fails due to loops
+  class EvaluationLoopError < Error; end
   
 end
