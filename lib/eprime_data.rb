@@ -159,7 +159,7 @@ module Eprime
       def [](index)
         num_index = @parent.find_column_index(index)
         unless (num_index.is_a?(Fixnum) and @parent.columns.length>num_index)
-          raise IndexError.new("Column #{num_index} does not exist")
+          raise IndexError.new("Column #{index} does not exist")
         end
         return @data[num_index]
       end
