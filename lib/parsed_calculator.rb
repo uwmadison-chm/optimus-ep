@@ -24,7 +24,9 @@ module Eprime
       include RParsec::Parsers
 
       def initialize
-        @operators = RParsec::Operators.new(%w{+ - * / % & ( )})
+        @operators = RParsec::Operators.new(
+          %w{+ - * / % & ( ) not and or = != > >= < <=}
+        )
         expr = nil
         lazy_expr = lazy { expr }
         atom = (
@@ -34,14 +36,24 @@ module Eprime
         
         lit = atom | (@operators['('] >> lazy_expr << @operators[')'])
         
+        # Follows hte standard C 
         table = RParsec::OperatorTable.new.
-          prefix(@operators['-'] >> lambda {|a| -a}, 50).
-          infixl(@operators['*'] >> lambda {|a, b| a*b}, 30).
-          infixl(@operators['/'] >> lambda {|a, b| a/b}, 30).
-          infixl(@operators['%'] >> lambda {|a, b| a%b}, 30).
-          infixl(@operators['+'] >> lambda {|a, b| a+b}, 10).
-          infixl(@operators['-'] >> lambda {|a, b| a-b}, 10).
-          infixl(@operators['&'] >> lambda {|a, b| a&b},5)
+          prefix(@operators['-'] >>   lambda {|a| -a}, 50).
+          prefix(@operators['not'] >> lambda {|a| a.logical_not}, 50).
+          infixl(@operators['*'] >>   lambda {|a, b| a*b}, 30).
+          infixl(@operators['/'] >>   lambda {|a, b| a/b}, 30).
+          infixl(@operators['%'] >>   lambda {|a, b| a%b}, 30).
+          infixl(@operators['+'] >>   lambda {|a, b| a+b}, 27).
+          infixl(@operators['-'] >>   lambda {|a, b| a-b}, 27).
+          infixl(@operators['&'] >>   lambda {|a, b| a&b}, 25).
+          infixl(@operators['>'] >>   lambda {|a, b| a>b}, 17).
+          infixl(@operators['>='] >>  lambda {|a, b| a>=b}, 17).
+          infixl(@operators['<'] >>   lambda {|a, b| a<b}, 17).
+          infixl(@operators['<='] >>  lambda {|a, b| a<=b}, 17).
+          infixl(@operators['='] >>   lambda {|a, b| a.eq(b)}, 15).
+          infixl(@operators['!='] >>  lambda {|a, b| a.neq(b)}, 15).
+          infixl(@operators['and'] >> lambda {|a, b| a.logical_and(b)}, 5).
+          infixl(@operators['or'] >>  lambda {|a, b| a.logical_or(b)}, 4)
         
         expr = RParsec::Expressions.build(lit, table)
         

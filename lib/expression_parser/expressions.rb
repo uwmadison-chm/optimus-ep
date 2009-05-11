@@ -14,15 +14,36 @@ module Eprime
     class Expr
       # All of our literals, etc will ineherit from Expr. This will imbue
       # them with the magic to work with our unary and binary operators.
-      BINARY_OPERATORS=[:+, :-, :*, :/, :%, :&]
+      BINARY_OPERATORS=[:+, :-, :*, :/, :%, :&, :>, :>=, :<, :<=]
       BINARY_OPERATORS.each do |op|
         define_method(op) { |other|
           return BinaryExpr.new(self, op, other)
         }
       end
-  
+      
+      def logical_and(other)
+        return BinaryExpr.new(self, :and, other)
+      end
+      
+      def logical_or(other)
+        return BinaryExpr.new(self, :or, other)
+      end
+      
+      def eq(other)
+        return BinaryExpr.new(self, "=".to_sym, other)
+      end
+      
+      def neq(other)
+        return BinaryExpr.new(self, '!='.to_sym, other)
+      end
+      
+      # Prefixes
       def -@
         return PrefixExpr.new(:-, self)
+      end
+      
+      def logical_not
+        return KeywordPrefixExpr.new('not', self)
       end
     end
 
@@ -62,6 +83,18 @@ module Eprime
       def evaluate(*args)
         rval = @right.evaluate(*args)
         return OpTable[@op].call(rval)
+      end
+    end
+    
+    class KeywordPrefixExpr < Expr
+      attr_reader :op, :right
+      def initialize(op, right)
+        @op = op
+        @right = right
+      end
+      
+      def to_s
+        "#{@op} (#{@right})"
       end
     end
 

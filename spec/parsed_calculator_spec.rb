@@ -73,15 +73,20 @@ describe Eprime::ParsedCalculator::ExpressionParser do
   end
   
   # We've done all the complex tests with + -- another associative binary
-  # operator. I'm assuming the others work as well.
-  it "should parse - as a binary operator" do
-    @exp.should parse_as("1 - 1", "(1 - 1)")
+  # operator. I'm assuming the others work as well. This will just shorthand
+  # that testing.
+  describe "with binary operators" do
+    before :all do
+      @ops = %w(+ - * / % & > >= < <= = != and or)
+    end
+    
+    it "should parse binary operators" do
+      @ops.each do |op|
+        @exp.should round_trip("(1 #{op} 1)")
+      end
+    end
   end
-  
-  it "should parse * as binary operator" do
-    @exp.should round_trip('(2 * 2)')
-  end
-  
+
   it "should give * higher precedence than +" do
     @exp.should parse_as("1 + 1 * 1", "(1 + (1 * 1))")
   end
@@ -89,11 +94,7 @@ describe Eprime::ParsedCalculator::ExpressionParser do
   it "should give * higher precedence than binary -" do
     @exp.should parse_as("1 - 1 * 1", "(1 - (1 * 1))")
   end
-  
-  it "should parse / as binary operator" do
-    @exp.should round_trip("(1 / 1)")
-  end
-  
+
   it "should give / the same precedence as *" do
     # This means we'll just use left-associtivity rules...
     @exp.should parse_as("1 / 1 * 1", "((1 / 1) * 1)")
@@ -108,12 +109,7 @@ describe Eprime::ParsedCalculator::ExpressionParser do
     @exp.should parse_as("-1*1", "(-(1) * 1)")
   end
   
-  it "should parse & as a binary operator" do
-    @exp.should round_trip("('a' & 'b')")
+  it "should parse 'not' as a unary prefix operator" do
+    @exp.should parse_as("not 1", "not (1)")
   end
-  
-  it "should parse % as a binary operator" do
-    @exp.should round_trip("(5 % 3)")
-  end
-  
 end
