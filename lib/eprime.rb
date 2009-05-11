@@ -26,4 +26,5 @@ module Eprime
   # Raised when a parse fails due to loops
   class EvaluationLoopError < Error; end
   
+  class DuplicateColumnError < Error; end
 end

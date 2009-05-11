@@ -82,9 +82,15 @@ describe Eprime::Transformers::ParsedColumnCalculator do
   end
   
   it "should pass a somewhat arbitrary test" do
-    @pc.computed_column "result", "{stim_time} + 100 / 2"
+    @pc.computed_column "result", "({stim_time} - {run_start})+ 100 / 2"
     @pc.each do |row|
-      row['result'].should == (row['stim_time'].to_f + 100 / 2)
+      row['result'].should == ((row['stim_time'].to_f - row['run_start'].to_f)+100/2)
     end
+  end
+  
+  it "should not allow adding a column with an existing name" do
+    lambda {
+      @pc.computed_column "stim_time", "1"
+    }.should raise_error(Eprime::DuplicateColumnError)
   end
 end

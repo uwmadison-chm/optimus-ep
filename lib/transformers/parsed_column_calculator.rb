@@ -38,9 +38,13 @@ module Eprime
       end
       
       def computed_column(name, expression_str)
-        # TODO handle duplicate names
+        if columns.include?(name)
+          raise DuplicateColumnError.new("Can't add duplicate column name #{name}")
+        end
         @computed_column_names << name
-        @computed_columns[name] = @parser.parse(expression_str)
+        @computed_columns[name] = ComputedColumn.new(
+          name, @parser.parse(expression_str)
+        )
         reset!
       end
       
@@ -77,6 +81,12 @@ module Eprime
       
       class ComputedColumn
         def initialize(name, parsed_expr)
+          @name = name
+          @parsed_expr = parsed_expr
+        end
+        
+        def evaluate(*args)
+          @parsed_expr.evaluate(*args)
         end
       end # class ComputedColumn
     end # class ParsedColumnCalculator
