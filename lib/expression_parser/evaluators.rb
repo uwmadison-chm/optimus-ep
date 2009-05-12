@@ -12,32 +12,36 @@ module Eprime
     module Evaluators
       NaN = 0.0/0.0
       
-      def all_num?(*args)
-        args.all? {|v| v.kind_of? Numeric}
-      end
-      module_function :all_num?
-      
-      def cast_for_comparison(*args)
-        aout = args.dup
-        # If any argument is numeric, cast everything to a number.
-        # Otherwise, don't touch.
-        if args.any? {|v| v.kind_of? Numeric }
-          aout = args.map {|v| floatify(v) }
+      class ArgList
+        include Enumerable
+        attr_accessor :args
+        def initialize(*args)
+          @args = args
         end
-        return aout
+        
+        def each(&block)
+          @args.each(&block)
+        end
+        
+        def all_num?
+          @args.all? {|v| v.kind_of? Numeric }
+        end
+        
+        def cast_for_comparison
+          @args.map {|v| floatify(v) }
+        end
+        
+        def bool_cast
+          @args.map {|v| v.to_s.strip == '' ? false : v }
+        end
+        
+        private
+        def floatify(arg)
+          return arg.to_f if arg.kind_of? Numeric
+          return arg.to_s.to_f if arg.to_s =~ /^-?\d+\.?\d*$/ 
+          return arg
+        end        
       end
-      module_function :cast_for_comparison
-      
-      def floatify(arg)
-        return arg.to_f if arg.kind_of? Numeric
-        return arg.to_s.to_f if arg.to_s =~ /^-?\d+\.?\d*$/ 
-        return arg
-      end
-      
-      def bool_cast(*args)
-        args.map {|v| v.to_s.strip == '' ? false : v}
-      end
-      module_function :bool_cast
       
       module Prefix
         Neg = lambda {|rval| 
@@ -49,7 +53,8 @@ module Eprime
         }
         
         Not = lambda {|rval|
-          cr = Evaluators.bool_cast(rval)[0]
+          args = ArgList.new(rval)
+          cr = args.bool_cast[0]
           return (not(cr))
         }
         
@@ -64,28 +69,32 @@ module Eprime
       # Here is where we get to say what our operators actually do!
       module Binary
         Plus = lambda {|lval, rval|
-          return lval+rval if Evaluators.all_num?(lval, rval)
+          args = ArgList.new(lval, rval)
+          return lval+rval if args.all_num?
           return NaN
         }
         
         Minus = lambda {|lval, rval|
-          return lval-rval if Evaluators.all_num?(lval, rval)
+          args = ArgList.new(lval, rval)
+          return lval-rval if args.all_num?
           return NaN
         }
         
         Times = lambda {|lval, rval|
-          return lval*rval if Evaluators.all_num?(lval, rval)
+          args = ArgList.new(lval, rval)
+          return lval*rval if args.all_num?
           return NaN
         }
         
         Div = lambda {|lval, rval|
-          return NaN if not Evaluators.all_num?(lval, rval)
+          args = ArgList.new(lval, rval)
           return NaN if rval.to_f == 0.0
           return lval.to_f/rval.to_f
         }
         
         Mod = lambda {|lval, rval|
-          return lval%rval if Evaluators.all_num?(lval, rval)
+          args = ArgList.new(lval, rval)
+          return lval%rval if args.all_num?
           return NaN
         }
         
@@ -94,27 +103,32 @@ module Eprime
         }
         
         And = lambda {|lval, rval|
-          cl, cr = Evaluators.bool_cast(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.bool_cast
           return (cl and cr)
         }
         
         Or = lambda {|lval, rval|
-          cl, cr = Evaluators.bool_cast(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.bool_cast
           return (cl or cr)
         }
         
         Equals = lambda {|lval, rval|
-          cl, cr = Evaluators.cast_for_comparison(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.cast_for_comparison
           return cl == cr
         }
         
         NotEquals = lambda {|lval, rval|
-          cl, cr = Evaluators.cast_for_comparison(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.cast_for_comparison
           return cl != cr
         }
         
         GreaterThan = lambda {|lval, rval|
-          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.cast_for_comparison
           begin
             return cl > cr
           rescue ArgumentError => e
@@ -123,7 +137,8 @@ module Eprime
         }
         
         LessThan = lambda {|lval, rval|
-          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.cast_for_comparison
           begin
             return cl < cr
           rescue ArgumentError => e
@@ -132,7 +147,8 @@ module Eprime
         }
         
         GreaterThanEquals = lambda {|lval, rval|
-          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.cast_for_comparison
           begin
             return cl >= cr
           rescue ArgumentError => e
@@ -141,7 +157,8 @@ module Eprime
         }
         
         LessThanEquals = lambda {|lval, rval|
-          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          args = ArgList.new(lval, rval)
+          cl, cr = args.cast_for_comparison
           begin
             return cl <= cr
           rescue ArgumentError => e
