@@ -17,6 +17,27 @@ module Eprime
       end
       module_function :all_num?
       
+      def cast_for_comparison(*args)
+        aout = args.dup
+        # If any argument is numeric, cast everything to a number.
+        # Otherwise, don't touch.
+        if args.any? {|v| v.kind_of? Numeric }
+          aout = args.map {|v| floatify(v) }
+        end
+        return aout
+      end
+      module_function :cast_for_comparison
+      
+      def floatify(arg)
+        return arg.to_f if arg.kind_of? Numeric
+        return arg.to_s.to_f if arg.to_s =~ /^-?\d+\.?\d*$/ 
+        return arg
+      end
+      
+      def bool_cast(*args)
+        args.map {|v| v.to_s.strip == '' ? false : v}
+      end
+      module_function :bool_cast
       
       module Prefix
         Neg = lambda {|rval| 
@@ -27,8 +48,14 @@ module Eprime
           end
         }
         
+        Not = lambda {|rval|
+          cr = Evaluators.bool_cast(rval)[0]
+          return (not(cr))
+        }
+        
         OpTable = {
-          :- => Neg
+          :- => Neg,
+          :not => Not
         }
       end # module Prefix
 
@@ -66,13 +93,77 @@ module Eprime
           return lval.to_s+rval.to_s
         }
         
+        And = lambda {|lval, rval|
+          cl, cr = Evaluators.bool_cast(lval, rval)
+          return (cl and cr)
+        }
+        
+        Or = lambda {|lval, rval|
+          cl, cr = Evaluators.bool_cast(lval, rval)
+          return (cl or cr)
+        }
+        
+        Equals = lambda {|lval, rval|
+          cl, cr = Evaluators.cast_for_comparison(lval, rval)
+          return cl == cr
+        }
+        
+        NotEquals = lambda {|lval, rval|
+          cl, cr = Evaluators.cast_for_comparison(lval, rval)
+          return cl != cr
+        }
+        
+        GreaterThan = lambda {|lval, rval|
+          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          begin
+            return cl > cr
+          rescue ArgumentError => e
+            return false
+          end
+        }
+        
+        LessThan = lambda {|lval, rval|
+          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          begin
+            return cl < cr
+          rescue ArgumentError => e
+            return false
+          end
+        }
+        
+        GreaterThanEquals = lambda {|lval, rval|
+          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          begin
+            return cl >= cr
+          rescue ArgumentError => e
+            return false
+          end
+        }
+        
+        LessThanEquals = lambda {|lval, rval|
+          cl, cr =  Evaluators.cast_for_comparison(lval, rval)
+          begin
+            return cl <= cr
+          rescue ArgumentError => e
+            return false
+          end
+        }
+
         OpTable = {
           :+ => Plus,
           :- => Minus,
           :* => Times,
           :/ => Div,
           :% => Mod,
-          :& => Concat
+          :& => Concat,
+          :and => And,
+          :or => Or,
+          '='.to_sym => Equals,
+          '!='.to_sym => NotEquals,
+          :> => GreaterThan,
+          :< => LessThan,
+          :>= => GreaterThanEquals,
+          :<= => LessThanEquals
         }
       end
     end

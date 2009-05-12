@@ -27,6 +27,27 @@ describe Prefix do
       @neg.call("a").should be_nan
     end
   end
+  
+  describe 'boolean not' do
+    before :all do
+      @not = Prefix::Not
+    end
+    
+    it "should work with booleans" do
+      @not.call(true).should be_false
+      @not.call(false).should be_true
+    end
+    
+    it "should work with numbers" do
+      @not.call(1).should be_false
+      @not.call(0.0).should be_false
+    end
+    
+    it "should work with strings" do
+      @not.call("1").should be_false
+      @not.call("").should be_true
+    end
+  end
 end
 
 describe Binary do
@@ -125,5 +146,96 @@ describe Binary do
     it "should not mod strings" do
       @mod.call(5, 'a').should be_nan
     end
+  end
+  
+  describe "and" do
+    before :all do
+      @and = Binary::And
+    end
+    
+    it "should work with booleans" do
+      @and.call(true, true).should be_true
+      @and.call(false, true).should be_false
+      @and.call(false, false).should be_false
+    end
+    
+    it "should consider all numbers true" do
+      @and.call(0.0, 1).should be_true
+    end
+    
+    it "should consider blanks to be false" do
+      @and.call('', true).should be_false
+    end
+  end
+  
+  describe "or" do
+    before :all do
+      @or = Binary::Or
+    end
+    
+    it "should work with booleans" do
+      @or.call(true, true).should be_true
+      @or.call(true, false).should be_true
+      @or.call(false, false).should be_false
+    end
+    
+    it "should consider numbers true" do
+      @or.call(0.0, 0.0).should be_true
+    end
+    
+    it "should consider blanks false" do
+      @or.call('', '').should be_false
+    end
+  end
+  
+  describe "comparisons" do
+    nan = 0.0/0.0
+    # We're just gonna loop through this table and check...
+    comp_table = Binary::OpTable
+    comp_ops = %w(= != > < >= <=)
+    test_table = {
+      :equal_nums => 
+        {:lr => [1,1], :true_for => %w(= >= <=), :false_for => %w(!= > <)},
+      :equal_strs => 
+        {:lr => %w(a a), :true_for => %w(= >= <=), :false_for => %w(!= > <)},
+      :equal_num_strnum =>
+        {:lr => [1,'1'], :true_for => %w(= >= <=), :false_for => %w(!= > <)},
+      :neq_str_num =>
+        {:lr => [1, 'a'], :true_for => %w(!=), :false_for => %w(= > < >= <=)},
+      :lt_nums => 
+        {:lr => [1,2], :true_for => %w(!= < <=), :false_for => %w(= > >=)},
+      :lt_num_strnum => 
+        {:lr => [1,'2'], :true_for => %w(!= < <=), :false_for => %w(= > >=)},
+      :lt_str =>
+        {:lr => %w(a b), :true_for => %w(!= < <=), :false_for => %w(= > >=)},
+      :gt_nums => 
+        {:lr => [2,1], :true_for => %w(!= > >=), :false_for => %w(= < <=)},
+      :gt_num_strnum => 
+        {:lr => ['2',1], :true_for => %w(!= > >=), :false_for => %w(= < <=)},
+      :gt_str =>
+        {:lr => %w(b a), :true_for => %w(!= > >=), :false_for => %w(= < <=)},
+      :nans =>
+        {:lr => [nan,nan], :true_for => %w(!=), :false_for => %w(= > < >= <=)},
+    }
+    
+    test_table.each do |name, test_data|
+      true_tests = test_data[:true_for]
+      false_tests = test_data[:false_for]
+      describe "between #{test_data[:lr].inspect}" do
+        it "should test all comparisons" do
+          (true_tests+false_tests).sort.should == comp_ops.sort
+        end
+        true_tests.each do |test_name|
+          it "should be true for #{test_name}" do
+            comp_table[test_name.to_sym].call(*test_data[:lr]).should be_true
+          end
+        end
+        false_tests.each do |test_name|
+          it "should be false for #{test_name}" do
+            comp_table[test_name.to_sym].call(*test_data[:lr]).should be_false
+          end
+        end
+      end # describe
+    end# table.each
   end
 end
