@@ -37,13 +37,16 @@ module Eprime
         reset!
       end
       
-      def computed_column(name, expression_str)
+      def computed_column(name, computable)
         if columns.include?(name)
           raise DuplicateColumnError.new("Can't add duplicate column name #{name}")
         end
+        if computable.is_a? String
+          computable = @parser.parse(computable)
+        end
         @computed_column_names << name
         @computed_columns[name] = ComputedColumn.new(
-          name, @parser.parse(expression_str)
+          name, computable
         )
         reset!
       end
@@ -66,6 +69,8 @@ module Eprime
         @computed_data = nil
       end
       
+      # Strategy: Compute everything and return it. No lazy-evaluation stuff
+      # to worry about -- we just return a vanilla Eprime::Data object.
       def computed_data
         return @computed_data if @computed_data
         @computed_data = Eprime::Data.new(columns)
@@ -80,13 +85,20 @@ module Eprime
       end
       
       class ComputedColumn
-        def initialize(name, parsed_expr)
+        def initialize(name, computable)
           @name = name
-          @parsed_expr = parsed_expr
+          @computable = computable
         end
         
         def evaluate(*args)
-          @parsed_expr.evaluate(*args)
+          if @computable.respond_to? :call
+            # *args should really just be a hash -- find the :row element
+            # or assume it's a blank list
+            row = (args.last || {})[:row] || []
+            @computable.call(row)
+          else
+            @computable.evaluate(*args)
+          end
         end
       end # class ComputedColumn
     end # class ParsedColumnCalculator

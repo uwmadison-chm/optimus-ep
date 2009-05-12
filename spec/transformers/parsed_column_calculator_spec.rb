@@ -58,6 +58,15 @@ describe Eprime::Transformers::ParsedColumnCalculator do
     end
   end
   
+  it "should return values for columns based on lambdas" do
+    @pc.computed_column NEW_COLUMN, lambda {|row| row['stim_time'] }
+    @pc.computed_column "NEW_COL2", lambda {|row| 1}
+    @pc.each do |row|
+      row[NEW_COLUMN].should == row['stim_time']
+      row["NEW_COL2"].should == 1
+    end
+  end
+  
   it "should return computed columns based on literal columns" do
     @pc.computed_column NEW_COLUMN, "{stim_time}"
     @pc.each do |row|
