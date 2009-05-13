@@ -93,7 +93,8 @@ describe Eprime::Transformers::ParsedColumnCalculator do
   it "should pass a somewhat arbitrary test" do
     @pc.computed_column "result", "({stim_time} - {run_start})+ 100 / 2"
     @pc.each do |row|
-      row['result'].should == ((row['stim_time'].to_f - row['run_start'].to_f)+100/2)
+      row['result'].should == (
+        (row['stim_time'].to_f - row['run_start'].to_f)+100/2)
     end
   end
   
@@ -101,5 +102,81 @@ describe Eprime::Transformers::ParsedColumnCalculator do
     lambda {
       @pc.computed_column "stim_time", "1"
     }.should raise_error(Eprime::DuplicateColumnError)
+  end
+  
+  describe "with reset logic" do
+    it "should allow setting a column with reset_when logic" do
+      lambda {
+        @pc.computed_column NEW_COLUMN, "{stim_time}", :reset_when => "1"
+      }.should_not raise_error
+    end
+    
+    it "should reset only when condition passes" do
+      @pc.computed_column NEW_COLUMN, "{stim_time}", 
+        :reset_when => "{sparse}"
+      val = ''
+      @pc.each do |row|
+        val = row['stim_time'] if row['sparse'].to_s != ''
+        row[NEW_COLUMN].to_f.should == val.to_f
+      end
+    end
+    
+    it "should reset with an always true condition" do
+      @pc.computed_column NEW_COLUMN, "{stim_time}", :reset_when => "1"
+      @pc.each do |row|
+        row[NEW_COLUMN].to_f.should == row['stim_time'].to_f
+      end
+    end
+    
+    it "should never update when false condition" do
+      @pc.computed_column NEW_COLUMN, "{stim_time}", :reset_when => "''"
+      @pc.each do |row|
+        row[NEW_COLUMN].should be_nil
+      end
+    end
+    
+    it "should accept :once as a reset condition" do
+      @pc.computed_column NEW_COLUMN, "{stim_time}", :reset_when => :once
+      val = @pc[0]['stim_time']
+      @pc.each do |row|
+        row[NEW_COLUMN].to_f.should == val.to_f
+      end
+    end
+  end
+  
+  describe "with counting logic" do
+    it "should count" do
+      init = 0
+      @pc.computed_column NEW_COLUMN, init, :count_when => "1", 
+        :count_by => :next, :reset_when => :once
+      @pc.each do |row|
+        init += 1
+        row[NEW_COLUMN].to_f.should == init.to_f
+      end
+    end
+    
+    it "should count sometimes" do
+      init= 0
+      @pc.computed_column NEW_COLUMN, init, :count_when => "{sparse}",
+        :reset_when => :once, :count_by => :next
+      
+      @pc.each do |row|
+        if row['sparse'].to_s != ''
+          init += 1
+        end
+        
+        row[NEW_COLUMN].to_f.should == init.to_f
+      end
+    end
+    
+    it "should reset sometimes" do
+      init = 0
+      @pc.computed_column NEW_COLUMN, init, :count_when => "1", 
+        :count_by => :next, :reset_when => "{sparse}"
+      
+      @pc.each do |row|
+        
+      end
+    end
   end
 end

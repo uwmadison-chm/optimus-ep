@@ -25,6 +25,11 @@ module Eprime
       
       include Enumerable
       
+      DEFAULT_COL_OPTS = {
+        :reset_when => true,
+        :count_when => false,
+        :count_by => :next
+      }
       def initialize(parser = Eprime::ParsedCalculator::ExpressionParser.new)
         @computed_column_names = []
         @computed_columns = {}
@@ -37,16 +42,18 @@ module Eprime
         reset!
       end
       
-      def computed_column(name, computable)
+      def computed_column(name, start_val, options = {})
         if columns.include?(name)
           raise DuplicateColumnError.new("Can't add duplicate column name #{name}")
         end
-        if computable.is_a? String
-          computable = @parser.parse(computable)
-        end
+        sve = Evaluatable.new(start_val, @parser)
         @computed_column_names << name
+        new_opts = DEFAULT_COL_OPTS.merge(options)
+        DEFAULT_COL_OPTS.keys.each do |key|
+          new_opts[key] = Evaluatable.new(new_opts[key], @parser)
+        end
         @computed_columns[name] = ComputedColumn.new(
-          name, computable
+          name, sve, new_opts
         )
         reset!
       end
@@ -85,22 +92,77 @@ module Eprime
       end
       
       class ComputedColumn
-        def initialize(name, computable)
+        COUNTERS = {
+          :next => lambda {|val|
+            return val.succ if val.respond_to? :succ
+            return val + 1
+          }
+        }
+        
+        def initialize(name, reset_exp, options = {})
           @name = name
-          @computable = computable
+          @reset_exp = reset_exp
+          @reset_when = options[:reset_when]
+          @count_when = options[:count_when]
+          @count_by = options[:count_by]
+          @current_value = nil
         end
         
         def evaluate(*args)
-          if @computable.respond_to? :call
-            # *args should really just be a hash -- find the :row element
-            # or assume it's a blank list
-            row = (args.last || {})[:row] || []
-            @computable.call(row)
+          if @reset_when.bool_eval(*args)
+            @current_value = @reset_exp.evaluate(*args)
+          end
+          next_val! if @count_when.bool_eval(*args)
+          return @current_value
+        end
+        
+        private
+        def next_val!(*args)
+          return if @current_value.nil?
+          cval = @count_by.evaluate(*args)
+          counter = COUNTERS[cval] || cval
+          if counter.respond_to?(:call)
+            @current_value = counter.call(@current_value)
           else
-            @computable.evaluate(*args)
+              @current_value += counter
           end
         end
       end # class ComputedColumn
+      
+      class Evaluatable
+        def initialize(target, parser = nil)
+          if target.is_a? String
+            @target = parser.parse(target)
+          else
+            @target = target
+          end
+        end
+        
+        def evaluate(*args)
+          # Check for magicality
+          if @target == :once
+            @target = false
+            return true
+          end
+          # If we don't have a call method or an evaluate method, just
+          # this as our own default method.
+          if not [:call, :evaluate].any? {|msg| @target.respond_to? msg}
+            return @target
+          end
+          if @target.respond_to? :call
+            row = (args.last || {})[:row] || []
+            return @target.call(row)
+          else
+            return @target.evaluate(*args)
+          end
+        end
+        
+        def bool_eval(*args)
+          val = self.evaluate(*args)
+          return false if val == ''
+          return val
+        end
+      end# class Evaluatable
     end # class ParsedColumnCalculator
   end
 end
