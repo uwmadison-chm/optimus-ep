@@ -43,7 +43,13 @@ module Eprime
       end
       
       def logical_not
-        return KeywordPrefixExpr.new('not', self)
+        return KeywordPrefixExpr.new(:not, self)
+      end
+      
+      def to_bool(*args)
+        val = evaluate(*args)
+        return false if val == ''
+        return val
       end
     end
 
@@ -84,15 +90,10 @@ module Eprime
         rval = @right.evaluate(*args)
         return OpTable[@op].call(rval)
       end
+      
     end
     
-    class KeywordPrefixExpr < Expr
-      attr_reader :op, :right
-      def initialize(op, right)
-        @op = op
-        @right = right
-      end
-      
+    class KeywordPrefixExpr < PrefixExpr
       def to_s
         "#{@op} (#{@right})"
       end

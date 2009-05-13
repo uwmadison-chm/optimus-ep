@@ -76,12 +76,9 @@ describe Eprime::ParsedCalculator::ExpressionParser do
   # operator. I'm assuming the others work as well. This will just shorthand
   # that testing.
   describe "with binary operators" do
-    before :all do
-      @ops = %w(+ - * / % & > >= < <= = != and or)
-    end
-    
-    it "should parse binary operators" do
-      @ops.each do |op|
+    ops = %w(+ - * / % & > >= < <= = != and or)
+    ops.each do |op|
+      it "should parse #{op} as binary operator" do
         @exp.should round_trip("(1 #{op} 1)")
       end
     end

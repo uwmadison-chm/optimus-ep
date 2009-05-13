@@ -23,12 +23,22 @@ describe Eprime::ParsedCalculator::ExpressionParser do
       nl = @exp.parse("1")
       nl.should evaluate_to(1)
     end
+    
+    it "should booleanify number literals" do
+      nl = @exp.parse("1")
+      nl.to_bool.should be_true
+    end
   end
   
   describe "string literals" do
     it "should evaluate string literals" do
       sl = @exp.parse("'foo'")
       sl.should evaluate_to("foo")
+    end
+    
+    it "should interpret full strings as true" do
+      sl = @exp.parse("'foo'")
+      sl.to_bool.should be_true
     end
   end
   
@@ -41,6 +51,12 @@ describe Eprime::ParsedCalculator::ExpressionParser do
     it "should return NaN when negating strings" do
       px = @exp.parse("-'a'")
       px.should evaluate_to(NaN)
+    end
+    
+    it "should reverse things with not" do
+      px = @exp.parse("not 1")
+      px.should evaluate_to(false)
+      px.to_bool.should be_false
     end
   end
   
@@ -89,5 +105,15 @@ describe Eprime::ParsedCalculator::ExpressionParser do
       bx = @exp.parse("5 % 3")
       bx.should evaluate_to(2)
     end
+
+    describe "comparisons" do
+      it "should understand equality exprs" do
+        bx = @exp.parse("1 = 1")
+        bx.should evaluate_to(true)
+        bx.to_bool.should be_true
+      end
+    end
+
   end
+  
 end
