@@ -8,16 +8,16 @@
 require File.join(File.dirname(__FILE__),'../spec_helper')
 require File.join(File.dirname(__FILE__), '../../lib/eprime')
 
-require 'transformers/parsed_column_calculator'
+require 'transformers/column_calculator'
 
 include EprimeTestHelper
 
 NEW_COLUMN = 'NEW_COLUMN'
 
-describe Eprime::Transformers::ParsedColumnCalculator do
+describe Eprime::Transformers::ColumnCalculator do
   before :each do
     @edata = mock_edata
-    @pc = Eprime::Transformers::ParsedColumnCalculator.new
+    @pc = Eprime::Transformers::ColumnCalculator.new
     @pc.data = @edata
   end
   

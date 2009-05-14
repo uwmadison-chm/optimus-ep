@@ -20,7 +20,7 @@ module Eprime
     # Better: If you've got funny numbers, coerce into numericness. Make
     # coercion very robust.
   
-    class ParsedColumnCalculator
+    class ColumnCalculator
       attr_accessor :data
       
       include Enumerable
@@ -163,6 +163,6 @@ module Eprime
           return val
         end
       end# class Evaluatable
-    end # class ParsedColumnCalculator
+    end # class ColumnCalculator
   end
 end
