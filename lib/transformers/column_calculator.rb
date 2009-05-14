@@ -5,7 +5,6 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-require 'calculator'
 require 'parsed_calculator'
 module Eprime
   module Transformers
@@ -22,6 +21,7 @@ module Eprime
   
     class ColumnCalculator
       attr_accessor :data
+      attr_accessor :sort_expression
       
       include Enumerable
       
@@ -35,11 +35,16 @@ module Eprime
         @computed_columns = {}
         @computed_data = nil
         @parser = parser
+        @sort_expression = nil
       end
       
       def data=(data)
         @data = data
         reset!
+      end
+      
+      def sort_expression=(value)
+        @sort_expression = Evaluatable.new(value, @parser)
       end
       
       def computed_column(name, start_val, options = {})
@@ -56,6 +61,14 @@ module Eprime
           name, sve, new_opts
         )
         reset!
+      end
+      
+      def copydown_column(new_name, old_name)
+        computed_column(new_name, "{#{old_name}}", :reset_when => "{#{old_name}}")
+      end
+      
+      def counter_column(name, start_val = 1, options = {})
+        computed_column(name, start_val, options = {})
       end
       
       def columns
@@ -85,6 +98,11 @@ module Eprime
         @computed_data.each do |row|
           @computed_column_names.each do |col|
             row[col] = @computed_columns[col].evaluate(
+              :row => row, :computed_columns => @computed_columns
+            )
+          end
+          if @sort_expression.respond_to? :evaluate
+            row.sort_value = @sort_expression.evaluate(
               :row => row, :computed_columns => @computed_columns
             )
           end

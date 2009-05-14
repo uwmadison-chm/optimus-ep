@@ -15,6 +15,7 @@ require 'eprime'
 require 'transformers/column_calculator'
 require 'transformers/row_filter'
 require 'transformers/multipasser'
+require 'parsed_calculator'
 
 module Eprime
   module Transformers

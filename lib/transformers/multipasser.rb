@@ -60,7 +60,7 @@ module Eprime
       end
     
       def add_pass(*args)
-        @computed = nil
+        reset!
         if args[0].instance_of? Pass
           p = args[0]
         else

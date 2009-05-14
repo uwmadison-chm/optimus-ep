@@ -33,7 +33,7 @@ describe Eprime::Transformers::BasicTransformer do
   end
   
   it "should allow copydown columns" do
-    @xf.copydown_column 'test', 'sparse'
+    @xf.copydown_column 'test', "sparse"
     @xf.columns.should include('test')
   end
   
@@ -52,14 +52,14 @@ describe Eprime::Transformers::BasicTransformer do
     @xf.add_pass(
       '-{stim_time}', 
       lambda {|r| !r['sparse'].to_s.empty?}, 
-      [['test', 'stim_time']]
+      [['test', '{stim_time}']]
     )
     df = @data.find_all { |r| !r['sparse'].to_s.empty? }
     @xf.size.should == df.size
   end
   
   it "should allow adding passes without a block" do
-    @xf.add_pass('-{stim_time}', lambda {|r| !r['sparse'].to_s.empty?}, [['test', 'stim_time']])
+    @xf.add_pass('-{stim_time}', lambda {|r| !r['sparse'].to_s.empty?}, [['test', '{stim_time}']])
     df = @data.find_all { |r| !r['sparse'].to_s.empty? }
     @xf.size.should == df.size
     @xf[0]['stim_time'].should == df.reverse[0]['stim_time']

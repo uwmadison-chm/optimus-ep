@@ -65,17 +65,17 @@ describe Eprime::Transformers::Multipasser do
     it "should allow multiple passes" do
       pass = @mpass.add_pass("{fix_time}")
       pass.computed_column "presented_time", "{fix_time}"
-      pass.computed_column "presented_name", "fixation"
+      pass.computed_column "presented_name", "'fixation'"
       @mpass.to_a.size.should == @data.size
     end
     
     it "should sort multiple passes together" do
       pass = @mpass.add_pass("{fix_time}")
       pass.computed_column "presented_time", "{fix_time}"
-      pass.computed_column "presented_name", "fixation"
+      pass.computed_column "presented_name", "'fixation'"
       pass = @mpass.add_pass("{stim_time}")
       pass.computed_column "presented_time", "{stim_time}"
-      pass.computed_column "presented_name", "stimulus"
+      pass.computed_column "presented_name", "'stimulus'"
       @mpass.to_a.size.should == @data.size*2
       ps = @mpass.to_a.sort_by{|row| row['presented_time'].to_f}
       @mpass.to_a.each_index do |i|

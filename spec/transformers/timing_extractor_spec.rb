@@ -42,7 +42,7 @@ describe Eprime::Transformers::TimingExtractor do
   end
   
   it "should extract from computed columns" do
-    @tx.computed_column 'foo', "a"
+    @tx.computed_column 'foo', "'a'"
     @tx.columns.should include('foo')
     @tx.extract_stimulus('foo', 'foo', 'foo')
     @tx.extracted_data.size.should == @data.size
@@ -63,8 +63,8 @@ describe Eprime::Transformers::TimingExtractor do
     before :each do
       @data = mock_edata
       @tx = TimingExtractor.new(@data)
-      @tx.computed_column('stim_name',"stim")
-      @tx.computed_column('fix_name', "fixation")
+      @tx.computed_column('stim_name',"'stim'")
+      @tx.computed_column('fix_name', "'fixation'")
       @tx.computed_column('stim_offset', '{stim_time} + 500 - {run_start}')
       @tx.computed_column('fix_offset', '{fix_time}+130-{run_start}')
       @tx.extract_stimulus('stim_name', 'stim_time', 'stim_time')
