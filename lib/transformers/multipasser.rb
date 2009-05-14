@@ -20,6 +20,7 @@
 
 require 'transformers/column_calculator'
 require 'transformers/row_filter'
+require 'parsed_calculator'
 
 module Eprime
   module Transformers
@@ -27,7 +28,10 @@ module Eprime
 
       class Pass
         attr_accessor :sort_expression, :row_filter, :computed_columns
-        def initialize(sort_expression = "1", row_filter = lambda{|r| true}, computed_columns = [])
+        def initialize(
+            sort_expression = "1", 
+            row_filter = lambda{|r| true}, 
+            computed_columns = [])
           @sort_expression = sort_expression
           @row_filter = row_filter
           @computed_columns = computed_columns

@@ -8,9 +8,13 @@
 require File.join(File.dirname(__FILE__),'../spec_helper')
 require File.join(File.dirname(__FILE__), '../../lib/eprime')
 require 'transformers/row_filter'
+require 'parsed_calculator'
 include EprimeTestHelper
 
 describe Eprime::Transformers::RowFilter do
+  before :all do
+    @parser = Eprime::ParsedCalculator::ExpressionParser.new
+  end
   before :each do
     @edata = mock_edata
   end
@@ -23,7 +27,8 @@ describe Eprime::Transformers::RowFilter do
   end
   
   it "should filter based on column equal test" do
-    filter = Eprime::Transformers::RowFilter.new(@edata, ['run_start', 'equals', 2400])
+    exp = @parser.parse("{run_start} = 2400")
+    filter = Eprime::Transformers::RowFilter.new(@edata, exp)
     filter.to_a.size.should_not == 0
     filter.each do |row|
       row['run_start'].should == '2400'

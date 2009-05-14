@@ -46,13 +46,8 @@ module Eprime
       def match?(row)
         if @filter.is_a? Proc
           return @filter.call(row)
-        elsif @filter.is_a? Array
-          # @filter will be of the form [col_name, comparator, [value]]
-          # only 'equals' is supported for comparators
-          if @filter[1].downcase != 'equals'
-            raise ArgumentError.new('Only equals is supported in filtering')
-          end
-          return row[@filter[0]].to_s == @filter[2].to_s
+        elsif @filter.respond_to? :to_bool
+          return @filter.to_bool(:row => row)
         end
       end
     end
