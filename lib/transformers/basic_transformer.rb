@@ -35,34 +35,34 @@ module Eprime
       end
       
       def data=(data)
-        reset!
+        reset_all!
         @data = Eprime::Data.new.merge(data)
       end
       
       def computed_column(*args)
-        reset!
+        reset_all!
         @computed_columns << args
       end
       
       def copydown_column(*args)
-        reset!
+        reset_all!
         @copydown_columns << args
       end
       
       def counter_column(*args)
-        reset!
+        reset_all!
         @counter_columns << args
       end
       
       def row_filter=(filter)
-        reset!
+        reset_filtered!
         @row_filter = filter
       end
       
       alias :row_filter :row_filter=
       
       def add_pass(*args)
-        reset!
+        reset_all!
         p = Multipasser::Pass.new(*args)
         yield p if block_given?
         @passes << p
@@ -76,25 +76,35 @@ module Eprime
         compute! and return @processed
       end
       
-      def reset!
+      def reset_all!
+        @computed = nil
+        @processed = nil
+        return true
+      end
+      
+      def reset_filtered!
         @processed = nil
         return true
       end
       
       def compute!
         return @processed if @processed
-        cc = ColumnCalculator.new
-        cc.data = @data
-        @computed_columns.each do |c|
-          cc.computed_column *c
+        
+        if @computed.nil?
+          @computed = ColumnCalculator.new
+          @computed.data = @data
+          @computed_columns.each do |c|
+            @computed.computed_column *c
+          end
+          @copydown_columns.each do |c|
+            @computed.copydown_column *c
+          end
+          @counter_columns.each do |c|
+            @computed.counter_column *c
+          end
         end
-        @copydown_columns.each do |c|
-          cc.copydown_column *c
-        end
-        @counter_columns.each do |c|
-          cc.counter_column *c
-        end
-        filtered = RowFilter.new(cc, @row_filter)
+        
+        filtered = RowFilter.new(@computed, @row_filter)
         multi = Multipasser.new(filtered)
         @passes.each do |p|
           multi.add_pass(p)
