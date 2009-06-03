@@ -6,12 +6,12 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
-include EprimeTestHelper
+require File.join(File.dirname(__FILE__), '../lib/optimus')
+include OptimusTestHelper
 
-describe Eprime::Reader do
+describe Optimus::Reader do
   before(:each) do
-    @reader = Eprime::Reader.new
+    @reader = Optimus::Reader.new
   end
   
 
@@ -23,7 +23,7 @@ describe Eprime::Reader do
   
   it "should raise when filetype is unknown" do
     File.open(UNKNOWN_FILE) do |file|
-      lambda { @reader.input = (file) }.should raise_error(Eprime::UnknownTypeError)
+      lambda { @reader.input = (file) }.should raise_error(Optimus::UnknownTypeError)
     end
   end
   
@@ -40,17 +40,17 @@ describe Eprime::Reader do
     
     it "should detect log files" do
       @reader.input = (@file)
-      @reader.type.should == Eprime::Reader::LogfileParser
+      @reader.type.should == Optimus::Reader::LogfileParser
     end
 
-    it "should return the Eprime::Reader::LogfileParser" do
+    it "should return the Optimus::Reader::LogfileParser" do
       @reader.input = @file
-      @reader.parser.should be_an_instance_of(Eprime::Reader::LogfileParser)
+      @reader.parser.should be_an_instance_of(Optimus::Reader::LogfileParser)
     end
     
-    it "should make a non-empty Eprime::Data object" do
+    it "should make a non-empty Optimus::Data object" do
       @reader.input = @file
-      data = @reader.eprime_data
+      data = @reader.optimus_data
       data.length.should > 0
       data.columns.sort.should == SORTED_COLUMNS
     end
@@ -72,41 +72,41 @@ describe Eprime::Reader do
   
     it "should detect excel csv files" do
       @reader.input = @file
-      @reader.type.should == Eprime::Reader::ExcelParser
+      @reader.type.should == Optimus::Reader::ExcelParser
     end
     
-    it "should resutn the Eprime::Reader::ExcelParser" do
+    it "should resutn the Optimus::Reader::ExcelParser" do
       @reader.input = @file
-      @reader.parser.should be_an_instance_of(Eprime::Reader::ExcelParser)
+      @reader.parser.should be_an_instance_of(Optimus::Reader::ExcelParser)
     end
     
-    it "should make a non-empty Eprime::Data object" do
+    it "should make a non-empty Optimus::Data object" do
       @reader.input = @file
-      data = @reader.eprime_data
+      data = @reader.optimus_data
       data.length.should > 0
       data.columns.sort.should == SORTED_COLUMNS
     end
     
   end
   
-  describe "with eprime tsv files" do
+  describe "with optimus tsv files" do
     before :each do
       @file = File.open(EPRIME_FILE)
     end
     
-    it "should detect eprime csv files" do
+    it "should detect optimus csv files" do
       @reader.input = @file
-      @reader.type.should == Eprime::Reader::EprimetabParser
+      @reader.type.should == Optimus::Reader::OptimustabParser
     end
     
-    it "should return the Eprime::Reader::EprimetabParser" do
+    it "should return the Optimus::Reader::OptimustabParser" do
       @reader.input = @file
-      @reader.parser.should be_an_instance_of(Eprime::Reader::EprimetabParser)
+      @reader.parser.should be_an_instance_of(Optimus::Reader::OptimustabParser)
     end
     
-    it "should make a non-empty Eprime::Data object" do
+    it "should make a non-empty Optimus::Data object" do
       @reader.input = @file
-      data = @reader.eprime_data
+      data = @reader.optimus_data
       data.length.should > 0
       data.columns.sort.should == SORTED_COLUMNS
     end
@@ -120,7 +120,7 @@ describe Eprime::Reader do
     
     it "should detect tsv files" do
       @reader.input = @file
-      @reader.type.should == Eprime::Reader::RawTabParser
+      @reader.type.should == Optimus::Reader::RawTabParser
     end
   end
 

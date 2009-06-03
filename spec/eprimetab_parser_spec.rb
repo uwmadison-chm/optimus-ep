@@ -6,18 +6,18 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
-include EprimeTestHelper
+require File.join(File.dirname(__FILE__), '../lib/optimus')
+include OptimusTestHelper
 
-describe Eprime::Reader::EprimetabParser do
+describe Optimus::Reader::OptimustabParser do
   before :each do
     @file = File.open(EPRIME_FILE, 'r')
-    @reader = Eprime::Reader::EprimetabParser.new(@file)
+    @reader = Optimus::Reader::OptimustabParser.new(@file)
   end
   
-  it "should read the sample eprime file" do
+  it "should read the sample optimus file" do
     lambda {
-      @reader.to_eprime
+      @reader.to_optimus
     }.should_not raise_error
   end
 end

@@ -6,14 +6,14 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
+require File.join(File.dirname(__FILE__), '../lib/optimus')
 require 'parsed_calculator'
 
-include EprimeTestHelper
+include OptimusTestHelper
 
-describe Eprime::ParsedCalculator::ExpressionParser do
+describe Optimus::ParsedCalculator::ExpressionParser do
   before :all do
-    @exp = Eprime::ParsedCalculator::ExpressionParser.new
+    @exp = Optimus::ParsedCalculator::ExpressionParser.new
   end
   
   it "should parse positive integers" do

@@ -6,12 +6,12 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'../spec_helper')
-require File.join(File.dirname(__FILE__), '../../lib/eprime')
+require File.join(File.dirname(__FILE__), '../../lib/optimus')
 
 require 'parsed_calculator'
 require 'expression_parser/evaluators'
-include EprimeTestHelper
-include Eprime::ParsedCalculator::Evaluators
+include OptimusTestHelper
+include Optimus::ParsedCalculator::Evaluators
 
 describe Prefix do
   describe 'negation' do

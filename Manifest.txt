@@ -8,9 +8,9 @@ bin/eprime2tabfile
 bin/extract_timings
 config/hoe.rb
 config/requirements.rb
-lib/eprime.rb
-lib/eprime_data.rb
-lib/eprime_reader.rb
+lib/optimus.rb
+lib/optimus_data.rb
+lib/optimus_reader.rb
 lib/eprimetab_parser.rb
 lib/excel_parser.rb
 lib/expression_parser/evaluators.rb
@@ -29,8 +29,8 @@ lib/transformers/row_filter.rb
 lib/transformers/timing_extractor.rb
 lib/version.rb
 lib/writers/stimtimes_writer.rb
-spec/eprime_data_spec.rb
-spec/eprime_reader_spec.rb
+spec/optimus_data_spec.rb
+spec/optimus_reader_spec.rb
 spec/eprimetab_parser_spec.rb
 spec/excel_parser_spec.rb
 spec/expression_parser/evaluators_spec.rb
@@ -43,7 +43,7 @@ spec/samples/bad_excel_tsv.txt
 spec/samples/corrupt_log_file.txt
 spec/samples/eprime_tsv.txt
 spec/samples/excel_tsv.txt
-spec/samples/optimus_log.txt
+spec/samples/eprime_log.txt
 spec/samples/raw_tsv.txt
 spec/samples/short_columns.txt
 spec/samples/sorted_columns.txt

@@ -1,4 +1,4 @@
-module Eprime
+module Optimus
   module VERSION
     MAJOR = 0
     MINOR = 8

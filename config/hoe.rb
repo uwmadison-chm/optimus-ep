@@ -1,4 +1,4 @@
-require 'version'
+require 'lib/version'
 
 AUTHOR = 'Nathan Vack'  # can also be an array of Authors
 EMAIL = "njvack@freshforever.net"
@@ -34,7 +34,7 @@ end
 REV = nil
 # UNCOMMENT IF REQUIRED:
 #REV = YAML.load(`svn info`)['Revision']
-VERS = Eprime::VERSION::STRING + (REV ? ".#{REV}" : "")
+VERS = Optimus::VERSION::STRING
 RDOC_OPTS = ['--quiet', '--title', 'optimus-ep documentation',
     "--opname", "index.html",
     "--line-numbers",

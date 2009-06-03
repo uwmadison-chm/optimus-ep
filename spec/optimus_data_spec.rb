@@ -6,14 +6,14 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
-include EprimeTestHelper
+require File.join(File.dirname(__FILE__), '../lib/optimus')
+include OptimusTestHelper
 
 INITIAL_COLUMNS = %w(col1 col2 col3 col4)
 NEW_COL_1 = "new_column_1"
 NEW_COL_2 = "new_column_2"
 
-shared_examples_for "empty Eprime::Data" do
+shared_examples_for "empty Optimus::Data" do
   it "should have no rows" do
     @data.length.should == 0
   end
@@ -23,7 +23,7 @@ shared_examples_for "empty Eprime::Data" do
   end
 end
 
-shared_examples_for "Eprime::Data with one row" do
+shared_examples_for "Optimus::Data with one row" do
   it "should be row-indexable" do
     @data[0].should === @row # Test for identicality
   end
@@ -80,20 +80,20 @@ shared_examples_for "Eprime::Data with one row" do
   end
 end
 
-describe Eprime::Data do
+describe Optimus::Data do
   describe "without initial columns" do
     before :each do
-      @data = Eprime::Data.new
-      @d2 = mock_eprime(2,3)
-      @d3 = mock_eprime(2,4)
+      @data = Optimus::Data.new
+      @d2 = mock_optimus(2,3)
+      @d3 = mock_optimus(2,4)
     end
     
-    it "should have return an Eprime::Data object on merge" do
-      @data.merge(@d2).should be_an_instance_of(Eprime::Data)
+    it "should have return an Optimus::Data object on merge" do
+      @data.merge(@d2).should be_an_instance_of(Optimus::Data)
     end
 
     describe "(empty)" do
-      it_should_behave_like "empty Eprime::Data"
+      it_should_behave_like "empty Optimus::Data"
   
       it "should have no columns at creation" do
         @data.columns.length.should == 0
@@ -127,7 +127,7 @@ describe Eprime::Data do
         d.size.should == (@data.size + @d2.size + @d3.size)
       end
   
-      it_should_behave_like "Eprime::Data with one row"
+      it_should_behave_like "Optimus::Data with one row"
   
       it "should add a column when setting a value in row" do
         @row[NEW_COL_1] = "test_value"
@@ -154,14 +154,14 @@ describe Eprime::Data do
   end
 end
 
-describe "Eprime::Data with initial columns" do
+describe "Optimus::Data with initial columns" do
   describe "without setting ignore" do
     before :each do
-      @data = Eprime::Data.new(INITIAL_COLUMNS)
+      @data = Optimus::Data.new(INITIAL_COLUMNS)
     end
   
     describe "(empty)" do
-      it_should_behave_like "empty Eprime::Data"
+      it_should_behave_like "empty Optimus::Data"
     
       it "should have the same number of columns as INITIAL_COLUMNS" do
         @data.columns.length.should == INITIAL_COLUMNS.length
@@ -170,7 +170,7 @@ describe "Eprime::Data with initial columns" do
     end
   
     describe "(with one row)" do
-      it_should_behave_like "Eprime::Data with one row"
+      it_should_behave_like "Optimus::Data with one row"
     
       before :each do
         @row = @data.add_row
@@ -179,7 +179,7 @@ describe "Eprime::Data with initial columns" do
       it "should raise a warning when adding a new column" do
         lambda {
           @row[NEW_COL_1] = "kitteh"
-        }.should raise_error(Eprime::ColumnAddedWarning)
+        }.should raise_error(Optimus::ColumnAddedWarning)
       end
     
     end
@@ -187,7 +187,7 @@ describe "Eprime::Data with initial columns" do
   
   describe "with ignore set" do
     before :each do
-      @data = Eprime::Data.new(INITIAL_COLUMNS, :ignore_warnings => true)
+      @data = Optimus::Data.new(INITIAL_COLUMNS, :ignore_warnings => true)
     end
     
     it "should not raise a warning when adding a new column" do

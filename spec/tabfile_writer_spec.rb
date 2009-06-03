@@ -6,29 +6,29 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
+require File.join(File.dirname(__FILE__), '../lib/optimus')
 require 'stringio'
 
-include EprimeTestHelper
+include OptimusTestHelper
 
 E_ROWS = 3
 E_COLS = 4
 
-describe "Eprime::TabfileWriter" do
+describe "Optimus::TabfileWriter" do
   
   before :each do
-    @eprime_data = mock_eprime(E_COLS, E_ROWS)
+    @optimus_data = mock_optimus(E_COLS, E_ROWS)
     @out_s = StringIO.new
   end
   
   it "should succeed at writing" do
-    writer = Eprime::TabfileWriter.new(@eprime_data, @out_s)
+    writer = Optimus::TabfileWriter.new(@optimus_data, @out_s)
     writer.write
   end
   
   describe "without filename line" do
     before :each do
-      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s)
+      @writer = Optimus::TabfileWriter.new(@optimus_data, @out_s)
       @writer.write
       @out_s.rewind
     end
@@ -51,7 +51,7 @@ describe "Eprime::TabfileWriter" do
       def @out_s.path # Redefine this so we can test the first line trick
         'spec_test'
       end
-      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s, :write_top_line => true)
+      @writer = Optimus::TabfileWriter.new(@optimus_data, @out_s, :write_top_line => true)
       @writer.write
       @out_s.rewind
     end
@@ -68,7 +68,7 @@ describe "Eprime::TabfileWriter" do
   
   describe "with good output columns specified" do
     before :each do
-      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s, :columns => ['col_2'])
+      @writer = Optimus::TabfileWriter.new(@optimus_data, @out_s, :columns => ['col_2'])
       @writer.write
       @out_s.rewind
     end
@@ -84,20 +84,20 @@ describe "Eprime::TabfileWriter" do
   describe "with nonexistent output column specified" do
 
     it "should raise an error when specifying a nonexistent column" do
-      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s, :columns => ['KITTEH'])
+      @writer = Optimus::TabfileWriter.new(@optimus_data, @out_s, :columns => ['KITTEH'])
       lambda { @writer.write }.should raise_error(IndexError)
     end
   end
   
   describe "with column_labels set to false" do
     before :each do
-      @writer = Eprime::TabfileWriter.new(@eprime_data, @out_s, {:column_labels => false})
+      @writer = Optimus::TabfileWriter.new(@optimus_data, @out_s, {:column_labels => false})
       @writer.write
       @out_s.rewind
     end
     
     it "should not write a line with column labels" do
-      @out_s.readlines.size.should == @eprime_data.size
+      @out_s.readlines.size.should == @optimus_data.size
     end
     
   end

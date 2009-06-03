@@ -6,57 +6,57 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
-include EprimeTestHelper
+require File.join(File.dirname(__FILE__), '../lib/optimus')
+include OptimusTestHelper
 
 
-shared_examples_for "Eprime::Reader::TabfileParser with sample data" do
-  it "should generate and Eprime::Data object" do
-    @eprime.should be_an_instance_of(Eprime::Data)
+shared_examples_for "Optimus::Reader::TabfileParser with sample data" do
+  it "should generate and Optimus::Data object" do
+    @optimus.should be_an_instance_of(Optimus::Data)
   end
 
   it "should have columns matching the test set" do
-    @eprime.columns.sort.should == STD_COLUMNS.sort
+    @optimus.columns.sort.should == STD_COLUMNS.sort
   end
 
   it "should contain three rows" do
-    @eprime.length.should == 3
+    @optimus.length.should == 3
   end
 end
 
-describe Eprime::Reader::TabfileParser do
+describe Optimus::Reader::TabfileParser do
   
   describe "without column order specified" do
     before :each do
       @file = File.open(EXCEL_FILE, 'r')
-      @reader = Eprime::Reader::TabfileParser.new(@file, :skip_lines => 1)
-      @eprime = @reader.to_eprime
+      @reader = Optimus::Reader::TabfileParser.new(@file, :skip_lines => 1)
+      @optimus = @reader.to_optimus
     end
     
-    it_should_behave_like "Eprime::Reader::TabfileParser with sample data"
+    it_should_behave_like "Optimus::Reader::TabfileParser with sample data"
   end
   
   describe "with column order specified" do
     before :each do
       @file = File.open(EXCEL_FILE, 'r')
-      @reader = Eprime::Reader::TabfileParser.new(@file, :skip_lines => 1, :columns => SORTED_COLUMNS)
-      @eprime = @reader.to_eprime
+      @reader = Optimus::Reader::TabfileParser.new(@file, :skip_lines => 1, :columns => SORTED_COLUMNS)
+      @optimus = @reader.to_optimus
     end
    
-    it_should_behave_like "Eprime::Reader::TabfileParser with sample data"
+    it_should_behave_like "Optimus::Reader::TabfileParser with sample data"
     
   end
   
   describe "with data missing from some rows" do
     before :each do
       @file = File.open(BAD_EXCEL_FILE, 'r')
-      @reader = Eprime::Reader::TabfileParser.new(@file, :skip_lines => 1)
+      @reader = Optimus::Reader::TabfileParser.new(@file, :skip_lines => 1)
     end
     
     it "should raise an error when parsing" do
       lambda {
-        @reader.to_eprime
-      }.should raise_error(Eprime::DamagedFileError)
+        @reader.to_optimus
+      }.should raise_error(Optimus::DamagedFileError)
     end
   end
 end

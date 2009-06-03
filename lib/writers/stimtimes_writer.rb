@@ -8,11 +8,11 @@
 # This class is a bit ugly around the edges -- I'm not quite sure how to
 # architect it, yet.
 
-require 'eprime'
+require 'optimus'
 require 'transformers/column_calculator'
 require 'transformers/row_filter'
 
-module Eprime
+module Optimus
   class StimtimesWriter
     include Transformers
     
@@ -25,11 +25,11 @@ module Eprime
     
     def initialize(argv)
       # Look through our necessary class variables and do some odd stuff
-      edata = Eprime::Data.new
+      edata = Optimus::Data.new
       argv.each do |filename|
         File.open(filename, 'r') do |f|
-          reader = Eprime::Reader.new(f)
-          edata.merge!(reader.eprime_data)
+          reader = Optimus::Reader.new(f)
+          edata.merge!(reader.optimus_data)
         end
         
         @calc = ColumnCalculator.new

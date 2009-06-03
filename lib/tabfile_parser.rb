@@ -6,16 +6,16 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 
-module Eprime
+module Optimus
   class Reader
     
-    # This class is for reading tab-delimited Eprime files. (Or, really, any tab-delimited file).
+    # This class is for reading tab-delimited Optimus files. (Or, really, any tab-delimited file).
     # The main option of interest is the :skip_lines option, which specifies how many lines
     # to skip before finding column names. For example:
     #
     # TabfileParser.new(stream, :skip_lines => 1)
     #
-    # is what you'd use for skipping the filename line in a standard eprime Excel file.
+    # is what you'd use for skipping the filename line in a standard optimus Excel file.
     #
     # Note: you'll generally be using subclasses of this, and not manually specifying skip_lines.
     
@@ -26,7 +26,7 @@ module Eprime
         @columns = options[:columns]
       end
       
-      def to_eprime
+      def to_optimus
         lines = @file.readlines
         @skip_lines.times do
           lines.shift
@@ -35,7 +35,7 @@ module Eprime
         file_columns = lines.shift.split("\t").map {|elt| elt.strip }
         expected_size = file_columns.size
         columns = file_columns
-        data = Eprime::Data.new(columns)
+        data = Optimus::Data.new(columns)
         current_line = @skip_lines+1
         lines.each do |line|
           current_line += 1

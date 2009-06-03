@@ -9,11 +9,11 @@
 
 require 'rubygems'
 require 'optparse'
-gem 'optimus-ep'
-require 'runners/generic_runner'
+#gem 'optimus-ep'
+require 'lib/runners/generic_runner'
 
 begin
-  txr = Eprime::Runners::GenericRunner.new(Eprime::Transformers::TimingExtractor, ARGV)
+  txr = Optimus::Runners::GenericRunner.new(Optimus::Transformers::TimingExtractor, ARGV)
   txr.process!
 rescue ArgumentError => e
   STDERR.puts e.message

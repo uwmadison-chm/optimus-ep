@@ -9,9 +9,9 @@
 
 require 'tabfile_parser'
 
-module Eprime
+module Optimus
   class Reader
-    class EprimetabParser < TabfileParser
+    class OptimustabParser < TabfileParser
       def initialize(file, options = {})
         options = options.merge(:skip_lines => 3)
         super(file, options)

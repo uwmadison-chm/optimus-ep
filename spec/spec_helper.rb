@@ -5,7 +5,7 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-module EprimeTestHelper
+module OptimusTestHelper
   
   class ParseAs
     def initialize(parse_str, expected)
@@ -137,8 +137,8 @@ module EprimeTestHelper
   end
   
   
-  def mock_eprime(col_count, row_count)
-    data = Eprime::Data.new()
+  def mock_optimus(col_count, row_count)
+    data = Optimus::Data.new()
     1.upto(row_count) do |rownum|
       row = data.add_row
       1.upto(col_count) do |colnum|
@@ -152,7 +152,7 @@ module EprimeTestHelper
   end
   
   def mock_edata
-    data = Eprime::Data.new()
+    data = Optimus::Data.new()
     row = data.add_row
     row['stim_time'] = '3188'
     row['run_start'] = '2400'

@@ -10,7 +10,7 @@ require 'excel_parser'
 require 'eprimetab_parser'
 require 'raw_tab_parser'
 
-module Eprime
+module Optimus
   
   # A class that should open any type of E-Prime text file and read it into
   # an E-Prime data structure.
@@ -20,7 +20,7 @@ module Eprime
     attr_reader :type, :parser, :input
     attr_accessor :options
     
-    PARSERS = [LogfileParser, ExcelParser, EprimetabParser, RawTabParser]
+    PARSERS = [LogfileParser, ExcelParser, OptimustabParser, RawTabParser]
 
     def initialize(input = nil, options = {})
       @options = options || {}
@@ -31,9 +31,9 @@ module Eprime
       set_input(input)
     end
     
-    def eprime_data
-      @eprime_data ||= @parser.to_eprime
-      return @eprime_data
+    def optimus_data
+      @optimus_data ||= @parser.to_optimus
+      return @optimus_data
     end
     
     def options=(options)
@@ -56,7 +56,7 @@ module Eprime
     end
     
     
-    # Sets @type to one of Eprime::Reader::TYPES or raises an Eprime::UnknownTypeError
+    # Sets @type to one of Optimus::Reader::TYPES or raises an Optimus::UnknownTypeError
     # Does not change file position.
     def set_type(file)
       @file = file
@@ -73,11 +73,11 @@ module Eprime
       if @type.nil?
         raise UnknownTypeError.new("Can't determine the type of #{file.path}")
       end
-      @eprime_data = nil
+      @optimus_data = nil
       @parser = @type.new(@file, @options)
     end
     
-    # Determines the type of an eprime file, based on its first two lines.
+    # Determines the type of an optimus file, based on its first two lines.
     # Returns one of the elements of PARSERS or nil
     def determine_file_type(first_lines)
       # Log files start with *** Header Start ***
@@ -85,7 +85,7 @@ module Eprime
       # Excel files have a filename on the first line (no tabs); the second line
       # contains at least three elements, tab-delimted
       #
-      # eprime CSV files will have at least three tab-delimited elements on the first line
+      # optimus CSV files will have at least three tab-delimited elements on the first line
       
       return PARSERS.detect { |parser_class| 
         parser_class.can_parse?(first_lines)

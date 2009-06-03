@@ -8,12 +8,12 @@
 # All of the complex behavior is exercised in 
 
 require File.join(File.dirname(__FILE__),'..','spec_helper')
-require File.join(File.dirname(__FILE__),'../../lib/eprime')
+require File.join(File.dirname(__FILE__),'../../lib/optimus')
 require File.join('transformers/basic_transformer')
-include EprimeTestHelper
-include Eprime::Transformers
+include OptimusTestHelper
+include Optimus::Transformers
 
-describe Eprime::Transformers::BasicTransformer do
+describe Optimus::Transformers::BasicTransformer do
   before :each do
     @data = mock_edata
     @xf = BasicTransformer.new(@data)

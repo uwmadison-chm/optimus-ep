@@ -9,17 +9,17 @@
 # This class should handle argument processing, file I/O, and such.
 
 
-require 'eprime'
-require 'eprime_reader'
+require 'optimus'
+require 'optimus_reader'
 require 'tabfile_writer'
 require 'transformers/timing_extractor'
 require 'optparse'
 require 'ostruct'
 
-module Eprime
+module Optimus
   module Runners
     class GenericRunner
-      include ::Eprime::Transformers
+      include ::Optimus::Transformers
       
       attr_accessor :out, :err
       def initialize(extractor_class, *args)
@@ -43,10 +43,10 @@ module Eprime
       end
       
       def read_data
-        data = Eprime::Data.new()
+        data = Optimus::Data.new()
         @options.input_files.each do |infile|
           File.open(infile) do |f|
-            data.merge!(Eprime::Reader.new(f).eprime_data)
+            data.merge!(Optimus::Reader.new(f).optimus_data)
           end
         end
         @data = data

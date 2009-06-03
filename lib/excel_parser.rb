@@ -9,7 +9,7 @@
 
 require 'tabfile_parser'
 
-module Eprime
+module Optimus
   class Reader
     class ExcelParser < TabfileParser
       def initialize(file, options = {})

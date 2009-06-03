@@ -5,16 +5,16 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-module Eprime
+module Optimus
   class Reader
     
     # Reads and parses E-Prime log files (the ones that start with 
-    # *** Header Start ***) and transforms them into an Eprime::Data structure
+    # *** Header Start ***) and transforms them into an Optimus::Data structure
     
     
     class LogfileParser
-      # Handles parsing eprime log files, which are essentially a blow-by-blow
-      # log of everything that happened during an eprime run.
+      # Handles parsing optimus log files, which are essentially a blow-by-blow
+      # log of everything that happened during an optimus run.
 
       FRAME_START = '*** LogFrame Start ***'
       FRAME_END = '*** LogFrame End ***'
@@ -46,7 +46,7 @@ module Eprime
         set_counters!
       end
       
-      def to_eprime
+      def to_optimus
         begin
           if @frames.nil? or @frames.empty?
             make_frames!
@@ -56,7 +56,7 @@ module Eprime
         end
     
         @columns ||= @found_cols.names
-        data = Eprime::Data.new(@columns)
+        data = Optimus::Data.new(@columns)
         self.leaf_frames.each do |frame|
           row = data.add_row
           @found_cols.names_with_cols.each do |pair|
@@ -294,4 +294,4 @@ module Eprime
       end
     end # Class LogfileParser
   end # Class Reader
-end # Module Eprime
+end # Module Optimus

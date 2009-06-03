@@ -22,7 +22,7 @@ require 'transformers/column_calculator'
 require 'transformers/row_filter'
 require 'parsed_calculator'
 
-module Eprime
+module Optimus
   module Transformers
     class Multipasser
 
@@ -84,13 +84,13 @@ module Eprime
           @computed = @data
           return @computed
         end
-        @computed = Eprime::Data.new
+        @computed = Optimus::Data.new
         # Just add a simple pass if we don't have any...
         @passes.each do |pass|
           # We want to duplicate the data, add a sort expression to it, add
           # computed columns, filter it, and then merge it into the complete
           # dataset.
-          #cur_data = @data.to_eprime_data 
+          #cur_data = @data.to_optimus_data 
           comp_data = ColumnCalculator.new
           comp_data.data = @data
           comp_data.sort_expression = pass.sort_expression

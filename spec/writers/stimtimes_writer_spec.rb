@@ -7,10 +7,10 @@
 
 
 require File.join(File.dirname(__FILE__),'../spec_helper')
-require File.join(File.dirname(__FILE__), '../../lib/eprime')
+require File.join(File.dirname(__FILE__), '../../lib/optimus')
 require File.join(File.dirname(__FILE__), '../../lib/writers/stimtimes_writer')
 
-describe Eprime::StimtimesWriter do
+describe Optimus::StimtimesWriter do
   # I don't actually know how to spec this out. I'm a bit worried.
   
 end

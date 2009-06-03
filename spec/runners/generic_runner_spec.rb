@@ -6,13 +6,13 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'../spec_helper')
-require File.join(File.dirname(__FILE__), '../../lib/eprime')
+require File.join(File.dirname(__FILE__), '../../lib/optimus')
 require 'runners/generic_runner'
-include EprimeTestHelper
+include OptimusTestHelper
 
-describe Eprime::Runners::GenericRunner do
+describe Optimus::Runners::GenericRunner do
   before :each do
-    @txr = Eprime::Runners::GenericRunner.new(Eprime::Transformers::BasicTransformer)
+    @txr = Optimus::Runners::GenericRunner.new(Optimus::Transformers::BasicTransformer)
   end
   
   it "should start with stdout in @out" do

@@ -5,19 +5,19 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 #
-# This is a complete general eprime transforer -- it supports computed columns
+# This is a complete general optimus transforer -- it supports computed columns
 # row filters, and multipass operation. In general, once you've read a file in,
 # this is probably what you want to use.
 # Essentially, this is just a wrapper around the ColumnCalculator,
 # RowFilter, and Multipasser classes
 
-require 'eprime'
+require 'optimus'
 require 'transformers/column_calculator'
 require 'transformers/row_filter'
 require 'transformers/multipasser'
 require 'parsed_calculator'
 
-module Eprime
+module Optimus
   module Transformers
     class BasicTransformer
       def initialize(data)
@@ -36,7 +36,7 @@ module Eprime
       
       def data=(data)
         reset_all!
-        @data = Eprime::Data.new.merge(data)
+        @data = Optimus::Data.new.merge(data)
       end
       
       def computed_column(*args)
@@ -109,7 +109,7 @@ module Eprime
         @passes.each do |p|
           multi.add_pass(p)
         end
-        @processed = Eprime::Data.new.merge(multi)
+        @processed = Optimus::Data.new.merge(multi)
       end
     end
   end

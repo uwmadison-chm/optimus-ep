@@ -6,11 +6,11 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 # This almost completely delegates to TabfileParser
-# It differs from EprimetabParser only in that it doesn't skip any lines.
+# It differs from OptimustabParser only in that it doesn't skip any lines.
 
 require 'tabfile_parser'
 
-module Eprime
+module Optimus
   class Reader
     class RawTabParser < TabfileParser
       def initialize(file, options = {})

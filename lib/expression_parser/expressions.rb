@@ -8,7 +8,7 @@
 # Expressions for the ParsedCalculator
 require 'expression_parser/evaluators'
 
-module Eprime
+module Optimus
   module ParsedCalculator
     NaN = 0.0/0.0
     class Expr

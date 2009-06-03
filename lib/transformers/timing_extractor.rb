@@ -18,7 +18,7 @@
 # the guts of the logic to extract stimuli.
 require 'transformers/basic_transformer'
 
-module Eprime
+module Optimus
   module Transformers
     class TimingExtractor < BasicTransformer
       def initialize(data)
@@ -54,7 +54,7 @@ module Eprime
       
       def extract!
         return if @extracted_data
-        @extracted_data = Eprime::Data.new
+        @extracted_data = Optimus::Data.new
         @stim_schemas.each do |ss|
           matches = processed.find_all(&ss['row_filter'])
           matches.each do |row|

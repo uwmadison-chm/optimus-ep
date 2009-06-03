@@ -6,18 +6,18 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'../spec_helper')
-require File.join(File.dirname(__FILE__), '../../lib/eprime')
+require File.join(File.dirname(__FILE__), '../../lib/optimus')
 
 require 'transformers/column_calculator'
 
-include EprimeTestHelper
+include OptimusTestHelper
 
 NEW_COLUMN = 'NEW_COLUMN'
 
-describe Eprime::Transformers::ColumnCalculator do
+describe Optimus::Transformers::ColumnCalculator do
   before :each do
     @edata = mock_edata
-    @pc = Eprime::Transformers::ColumnCalculator.new
+    @pc = Optimus::Transformers::ColumnCalculator.new
     @pc.data = @edata
   end
   
@@ -87,7 +87,7 @@ describe Eprime::Transformers::ColumnCalculator do
     @pc.computed_column "nc2", "{nc1}"
     lambda {
       @pc[0]
-    }.should raise_error(Eprime::EvaluationLoopError)
+    }.should raise_error(Optimus::EvaluationLoopError)
   end
   
   it "should pass a somewhat arbitrary test" do
@@ -101,7 +101,7 @@ describe Eprime::Transformers::ColumnCalculator do
   it "should not allow adding a column with an existing name" do
     lambda {
       @pc.computed_column "stim_time", "1"
-    }.should raise_error(Eprime::DuplicateColumnError)
+    }.should raise_error(Optimus::DuplicateColumnError)
   end
   
   describe "with reset logic" do

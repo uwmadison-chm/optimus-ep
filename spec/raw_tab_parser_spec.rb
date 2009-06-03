@@ -6,21 +6,21 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
-include EprimeTestHelper
+require File.join(File.dirname(__FILE__), '../lib/optimus')
+include OptimusTestHelper
 
-describe Eprime::Reader::RawTabParser do
+describe Optimus::Reader::RawTabParser do
   
   # We don't need to do much here; the superclass handles almost everything
   
   before :each do
     @file = File.open(RAW_TSV_FILE, 'r')
-    @reader = Eprime::Reader::ExcelParser.new(@file)
+    @reader = Optimus::Reader::ExcelParser.new(@file)
   end
   
   it "should read the sample tsv file" do
     lambda {
-      @reader.to_eprime
+      @reader.to_optimus
     }.should_not raise_error
   end
 end

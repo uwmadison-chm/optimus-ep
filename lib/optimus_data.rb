@@ -5,7 +5,7 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-module Eprime
+module Optimus
   
   # Raised when columns were specified at initialization time, and a novel
   # column is added. Generally, this is an indication that Something is Funny.
@@ -18,10 +18,10 @@ module Eprime
     end
   end
   
-  # A generalized data structure for eprime files -- essentially just
+  # A generalized data structure for optimus files -- essentially just
   # a table structure.
   # I should be able to say:
-  # e_data = Eprime::Data.new
+  # e_data = Optimus::Data.new
   # e_data[0][0] for the first row / col
   # e_data[0]['ExperimentName'] for the experiment name
   # e_data[0][0] = "foo"
@@ -39,7 +39,7 @@ module Eprime
   # One last thing: if you care about column ordering, but may be adding
   # data in an arbitrary order (example: reading E-Prime log files),
   # you can force a column order by passing an array of strings to
-  # Eprime::Data.new  
+  # Optimus::Data.new  
   
   class Data
     
@@ -57,15 +57,15 @@ module Eprime
       end
     end
     
-    # Returns a new Eprime::Data object containing the data from this
+    # Returns a new Optimus::Data object containing the data from this
     # and all other data sets
     def merge(*datasets)
       cols = [self, *datasets].map { |d| d.columns }.flatten.uniq
-      d = Eprime::Data.new(cols)
+      d = Optimus::Data.new(cols)
       return d.merge!(self, *datasets)
     end
     
-    # Combine more Eprime::Data objects into this one, in-place
+    # Combine more Optimus::Data objects into this one, in-place
     def merge!(*datasets)
       datasets.each do |source|
         add_columns!(source.columns)
@@ -99,10 +99,10 @@ module Eprime
     end
     
     def dup
-      Eprime::Data.new().merge!(self)
+      Optimus::Data.new().merge!(self)
     end
     
-    alias :to_eprime_data :dup
+    alias :to_optimus_data :dup
     
     # We mostly delegate to our rows array
     def method_missing(method, *args, &block)

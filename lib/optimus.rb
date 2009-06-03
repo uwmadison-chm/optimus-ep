@@ -8,16 +8,16 @@
 # Add our lib to the search path
 $: << File.expand_path(File.join(File.dirname(__FILE__), "..", "lib"))
 
-require 'eprime_data'
+require 'optimus_data'
 require 'version'
 require 'tabfile_writer'
-require 'eprime_reader'
+require 'optimus_reader'
 
-module Eprime
+module Optimus
 
   class Error < RuntimeError; end
 
-  # Raised whenever an input file's type can't be detemined by Eprime::Reader
+  # Raised whenever an input file's type can't be detemined by Optimus::Reader
   class UnknownTypeError < Error; end
   
   # Raised whenever an input file seems to be damaged

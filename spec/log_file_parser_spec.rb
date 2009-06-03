@@ -6,16 +6,16 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'spec_helper')
-require File.join(File.dirname(__FILE__), '../lib/eprime')
-include EprimeTestHelper
+require File.join(File.dirname(__FILE__), '../lib/optimus')
+include OptimusTestHelper
 
 
 
-describe Eprime::Reader::LogfileParser do
+describe Optimus::Reader::LogfileParser do
   describe "parsing a good file" do
     before :each do
       @file = File.open(LOG_FILE, 'r')
-      @reader = Eprime::Reader::LogfileParser.new(@file)
+      @reader = Optimus::Reader::LogfileParser.new(@file)
       @reader.make_frames!
     end
   
@@ -63,50 +63,50 @@ describe Eprime::Reader::LogfileParser do
       @reader.frames.first.parent.should_not be_nil
     end
     
-    describe "making eprime data" do
+    describe "making optimus data" do
       before :each do
-        @eprime = @reader.to_eprime
+        @optimus = @reader.to_optimus
       end
     
       it "should generate four rows from the example file" do
-        @eprime.length.should == 4
+        @optimus.length.should == 4
       end
       
       it "should follow the column order in the example file" do
-        @eprime.columns[0].should == "ExperimentName"
-        @eprime.columns[1].should == "SessionDate"
+        @optimus.columns[0].should == "ExperimentName"
+        @optimus.columns[1].should == "SessionDate"
       end
       
       it "should ignore extra colons in input data" do
-        @eprime.first['SessionTime'].should == '11:11:11'
+        @optimus.first['SessionTime'].should == '11:11:11'
       end
     
       it "should append level name to ambiguous columns" do
-        @eprime.columns.should include("CarriedVal[Session]")
+        @optimus.columns.should include("CarriedVal[Session]")
       end
       
       it "should not include ambiguous columns without level name" do
-        @eprime.columns.should_not include("CarriedVal")
+        @optimus.columns.should_not include("CarriedVal")
       end
       
       it "should include columns from level 2 and level 1 frames" do
-        @eprime.columns.should include("RandomSeed")
-        @eprime.columns.should include("BlockTitle")
+        @optimus.columns.should include("RandomSeed")
+        @optimus.columns.should include("BlockTitle")
       end
       
       it "should rename Experiment to ExperimentName" do
-        @eprime.columns.should include("ExperimentName")
-        @eprime.columns.should_not include("Experiment")
+        @optimus.columns.should include("ExperimentName")
+        @optimus.columns.should_not include("Experiment")
       end
     
       it "should compute task counters" do
-        @eprime.first["Block"].should == 1
-        @eprime.last["Block"].should == 3
-        @eprime.last["Trial"].should == 2
+        @optimus.first["Block"].should == 1
+        @optimus.last["Block"].should == 3
+        @optimus.last["Trial"].should == 2
       end
     
       it "should have a counter column" do
-        @eprime.columns.should include("Trial")
+        @optimus.columns.should include("Trial")
       end
     end
   end
@@ -114,9 +114,9 @@ describe Eprime::Reader::LogfileParser do
   describe "with sorted columns" do
     before :each do
       @file = File.open(LOG_FILE, 'r')
-      @reader = Eprime::Reader::LogfileParser.new(@file, :columns => STD_COLUMNS)
+      @reader = Optimus::Reader::LogfileParser.new(@file, :columns => STD_COLUMNS)
       @reader.make_frames!
-      @eprime = @reader.to_eprime
+      @optimus = @reader.to_optimus
     end
     
     after :each do
@@ -124,11 +124,11 @@ describe Eprime::Reader::LogfileParser do
     end
     
     it "should have ExperimentName first" do
-      @eprime.columns.first.should == "ExperimentName"
+      @optimus.columns.first.should == "ExperimentName"
     end
     
     it "should have four rows" do
-      @eprime.length.should == 4
+      @optimus.length.should == 4
     end
     
     
@@ -137,7 +137,7 @@ describe Eprime::Reader::LogfileParser do
   describe "parsing bad files" do
     before :each do
       @file = File.open(CORRUPT_LOG_FILE, 'r')
-      @reader = Eprime::Reader::LogfileParser.new(@file)
+      @reader = Optimus::Reader::LogfileParser.new(@file)
     end
     after :each do
       @file.close
@@ -145,18 +145,18 @@ describe Eprime::Reader::LogfileParser do
     
     it "should throw an error when the last frame is not closed" do
       lambda {@reader.make_frames!}.
-        should raise_error(Eprime::DamagedFileError)
+        should raise_error(Optimus::DamagedFileError)
     end
     
   end
   
 end
 
-describe Eprime::Reader::LogfileParser::ColumnList do
+describe Optimus::Reader::LogfileParser::ColumnList do
   before :each do
-    @cklass = Eprime::Reader::LogfileParser::Column
+    @cklass = Optimus::Reader::LogfileParser::Column
     @levels = ['', 'Foo', 'Bar']
-    @list = Eprime::Reader::LogfileParser::ColumnList.new(@levels)
+    @list = Optimus::Reader::LogfileParser::ColumnList.new(@levels)
   end
   
   it "should raise error when storing index 0" do

@@ -7,7 +7,7 @@
 #
 # Functions that actually handle evaluating operands and such.
 
-module Eprime
+module Optimus
   module ParsedCalculator
     module Evaluators
       NaN = 0.0/0.0

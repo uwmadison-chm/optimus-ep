@@ -6,12 +6,12 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'../spec_helper')
-require File.join(File.dirname(__FILE__), '../../lib/eprime')
+require File.join(File.dirname(__FILE__), '../../lib/optimus')
 require 'transformers/timing_extractor'
-include EprimeTestHelper
-include Eprime::Transformers
+include OptimusTestHelper
+include Optimus::Transformers
 
-describe Eprime::Transformers::TimingExtractor do
+describe Optimus::Transformers::TimingExtractor do
   before :each do
     @data = mock_edata
     @tx = TimingExtractor.new(@data)

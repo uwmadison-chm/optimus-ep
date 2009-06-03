@@ -10,9 +10,9 @@
 require 'rubygems'
 require 'optparse'
 gem 'optimus-ep'
-require 'eprime'
+require 'optimus'
 
-module Eprime
+module Optimus
   class LogToTabConverter
     attr_reader :options
     attr_accessor :data_out
@@ -38,12 +38,12 @@ module Eprime
     end
     
     def convert
-      eprime = Eprime::Data.new(@columns, :ignore_warnings => @options[:force])
+      optimus = Optimus::Data.new(@columns, :ignore_warnings => @options[:force])
       @options[:files].each do |filename|
         begin
           File.open(filename, 'r') do |f|
-            reader = Eprime::Reader.new(f, {:columns => @columns, :force => @options[:force]})
-            eprime.merge!(reader.eprime_data)
+            reader = Optimus::Reader.new(f, {:columns => @columns, :force => @options[:force]})
+            optimus.merge!(reader.optimus_data)
           end
         rescue Exception => e
           @err.puts e.message
@@ -51,7 +51,7 @@ module Eprime
           exit(1)
         end
       end
-      writer = Eprime::TabfileWriter.new(eprime, data_out, {
+      writer = Optimus::TabfileWriter.new(optimus, data_out, {
         :write_top_line => @options[:add_filename_line],
         :columns => @columns
         })
@@ -78,7 +78,7 @@ module Eprime
     def option_parser(option_hash, args)
       opts = OptionParser.new
 
-      opts.banner = "Usage: eprimelog2tabfile [options] INPUT_FILES"
+      opts.banner = "Usage: optimuslog2tabfile [options] INPUT_FILES"
       opts.separator ""
 
       opts.on('-o', '--outfile=OUTFILE', String,
@@ -143,9 +143,9 @@ module Eprime
 end
 
 begin
-  conv = Eprime::LogToTabConverter.new(ARGV)
+  conv = Optimus::LogToTabConverter.new(ARGV)
 rescue Exception => e
-  STDERR.puts e.message+"\nrun eprimelog2tabfile --help for options\n"
+  STDERR.puts e.message+"\nrun optimuslog2tabfile --help for options\n"
   exit(1)
 end
 

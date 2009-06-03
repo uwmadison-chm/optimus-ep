@@ -16,7 +16,7 @@ require 'rparsec'
 require 'pp'
 require 'expression_parser/expressions'
 
-module Eprime
+module Optimus
   module ParsedCalculator
     include RParsec
     class ExpressionParser

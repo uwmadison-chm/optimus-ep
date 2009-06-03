@@ -6,7 +6,7 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require 'parsed_calculator'
-module Eprime
+module Optimus
   module Transformers
 
     # This implements columnwise operations with a new shiny parser 
@@ -30,7 +30,7 @@ module Eprime
         :count_when => false,
         :count_by => :next
       }
-      def initialize(parser = Eprime::ParsedCalculator::ExpressionParser.new)
+      def initialize(parser = Optimus::ParsedCalculator::ExpressionParser.new)
         @computed_column_names = []
         @computed_columns = {}
         @computed_data = nil
@@ -90,10 +90,10 @@ module Eprime
       end
       
       # Strategy: Compute everything and return it. No lazy-evaluation stuff
-      # to worry about -- we just return a vanilla Eprime::Data object.
+      # to worry about -- we just return a vanilla Optimus::Data object.
       def computed_data
         return @computed_data if @computed_data
-        @computed_data = Eprime::Data.new(columns)
+        @computed_data = Optimus::Data.new(columns)
         @computed_data.merge!(@data)
         @computed_data.each do |row|
           @computed_column_names.each do |col|

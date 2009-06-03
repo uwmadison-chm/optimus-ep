@@ -6,13 +6,13 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require File.join(File.dirname(__FILE__),'../spec_helper')
-require File.join(File.dirname(__FILE__), '../../lib/eprime')
+require File.join(File.dirname(__FILE__), '../../lib/optimus')
 require 'transformers/multipasser'
 
-include Eprime::Transformers
-include EprimeTestHelper
+include Optimus::Transformers
+include OptimusTestHelper
 
-describe Eprime::Transformers::Multipasser do
+describe Optimus::Transformers::Multipasser do
   before :each do
     @mpass = Multipasser.new(mock_edata)
   end
