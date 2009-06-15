@@ -7,12 +7,14 @@
 # 
 # This execrises the main command-line runner system.
 
-require File.join(File.dirname(__FILE__),'../spec_helper')
-require File.join(File.dirname(__FILE__), '../../lib/optimus')
+require File.join(File.dirname(__FILE__),'../../spec_helper')
+require File.join(File.dirname(__FILE__), '../../../lib/optimus')
 include OptimusTestHelper
 
-require 'runners/yaml_template_runner'
+require 'runners/yaml_template/runner'
 
-describe Optimus::Runners::YamlTemplateRunner do
+include Optimus::Runners::YamlTemplate
+
+describe Runner do
   it "is pending"
 end

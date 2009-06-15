@@ -11,12 +11,12 @@ require File.join(File.dirname(__FILE__),'../../spec_helper')
 require File.join(File.dirname(__FILE__), '../../../lib/optimus')
 include OptimusTestHelper
 
-require 'runners/option_parsers/yaml_option_parser'
-include Optimus::Runners::OptionParsers
+require 'runners/yaml_template/option_parser'
+include Optimus::Runners::YamlTemplate
 
-describe YamlOptionParser do
+describe OptimusOptionParser do
   before :each do
-    @op = YamlOptionParser.new
+    @op = OptimusOptionParser.new
   end
   
   it "should have errors" do

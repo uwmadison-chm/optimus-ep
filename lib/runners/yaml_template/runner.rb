@@ -5,15 +5,14 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
-# OptionParser for the yaml_template_runner
-
+# This is the main wrapper class -- 
 
 require 'optimus'
 
 module Optimus
   module Runners
-    module YamlTemplateRunner
-      class OptionParser
+    module YamlTemplate
+      class Runner
       end
     end
   end
