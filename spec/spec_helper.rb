@@ -102,6 +102,7 @@ module OptimusTestHelper
     UNKNOWN_FILE = File.join(SAMPLE_DIR, 'unknown_type.txt')
     UNREADABLE_FILE = File.join(SAMPLE_DIR, 'unreadable_file')
     CORRUPT_LOG_FILE = File.join(SAMPLE_DIR, 'corrupt_log_file.txt')
+    UTF16LE_FILE = File.join(SAMPLE_DIR, 'optimus_log_utf16le.txt')
     
     
     STD_COLUMNS = ["ExperimentName", "Subject", "Session", "RFP.StartTime", "BlockTitle", "PeriodA", "CarriedVal[Session]", "BlockList", "Trial", 

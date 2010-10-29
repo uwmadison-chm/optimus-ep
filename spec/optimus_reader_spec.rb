@@ -124,4 +124,16 @@ describe Optimus::Reader do
     end
   end
 
+  describe "with utf16le files" do
+    before :each do
+      @file = File.open(UTF16LE_FILE)
+    end
+    
+    it "should read columns" do
+      @reader.input = @file
+      data = @reader.optimus_data
+      data.columns.sort.should == SORTED_COLUMNS
+    end
+  end
+
 end

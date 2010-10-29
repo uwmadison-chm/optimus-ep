@@ -78,7 +78,7 @@ module Optimus
       end
       
       def self.can_parse?(lines)
-        lines[0].include?('*** Header Start ***')
+        lines[0].include?(HEADER_START)
       end
       
       private

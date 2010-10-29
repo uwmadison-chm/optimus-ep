@@ -5,6 +5,9 @@
 # Written by Nathan Vack <njvack@wisc.edu>, at the Waisman Laborotory for Brain
 # Imaging and Behavior, University of Wisconsin - Madison
 
+require 'stringio'
+require 'iconv'
+
 require 'log_file_parser'
 require 'excel_parser'
 require 'eprimetab_parser'
@@ -54,11 +57,23 @@ module Optimus
       end
     end
     
+    def set_file_with_encoding(file)
+      file.rewind
+      datas = file.read(2)
+      if datas == "\377\376"
+        converted = Iconv.conv("ASCII//TRANSLIT", "UTF-16LE", file.read)
+        converted_f = StringIO.new(converted)
+      else
+        converted_f = file
+        converted_f.rewind
+      end
+      return converted_f
+    end
     
-    # Sets @type to one of Optimus::Reader::TYPES or raises an Optimus::UnknownTypeError
-    # Does not change file position.
+    # Sets @type to one of Optimus::Reader::TYPES or raises an 
+    # Optimus::UnknownTypeError. Does not change file position.
     def set_type(file)
-      @file = file
+      @file = set_file_with_encoding(file)
       original_pos = @file.pos
       @file.rewind
       first_lines = Array.new
