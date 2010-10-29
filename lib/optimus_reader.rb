@@ -14,7 +14,6 @@ module Optimus
   
   # A class that should open any type of E-Prime text file and read it into
   # an E-Prime data structure.
-  # This class isn't yet used anywhere.
   class Reader
     
     attr_reader :type, :parser, :input
