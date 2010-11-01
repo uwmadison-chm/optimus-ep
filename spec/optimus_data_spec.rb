@@ -176,10 +176,10 @@ describe "Optimus::Data with initial columns" do
         @row = @data.add_row
       end
     
-      it "should raise a warning when adding a new column" do
+      it "should not raise a warning when adding a new column" do
         lambda {
           @row[NEW_COL_1] = "kitteh"
-        }.should raise_error(Optimus::ColumnAddedWarning)
+        }.should_not raise_error
       end
     
     end
