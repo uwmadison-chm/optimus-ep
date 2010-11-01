@@ -7,17 +7,6 @@
 
 module Optimus
   
-  # Raised when columns were specified at initialization time, and a novel
-  # column is added. Generally, this is an indication that Something is Funny.
-  class ColumnAddedWarning < Exception
-    # We want to be able to get the index out of this
-    attr_reader :index
-    def initialize(message, index)
-      @index = index
-      super(message)
-    end
-  end
-  
   # A generalized data structure for optimus files -- essentially just
   # a table structure.
   # I should be able to say:
@@ -130,13 +119,7 @@ module Optimus
       @columns << col_id
       @column_hash[col_id] = index
       @column_hash[index] = index
-      if @columns_set_in_initialize and not @options[:ignore_warnings]
-        raise ColumnAddedWarning.new(
-          "Error: Added column #{col_id} after specifying columns at init", 
-          index
-        )
-      end
-      return index
+      index
     end
     
     private
