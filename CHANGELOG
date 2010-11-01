@@ -1,6 +1,8 @@
-v.0.8.0 Compatibility Warning: Lots of stuff has changed with the way column definition strings are computed. Test your existing scripts after updating! Architecture changes: Completely rewrote parser. String-based expressions now deprecate lambdas, though they'll continue to work in the future. This change fixes lots of odd bugs in defining computed columns and filters. Bug fixes: The --columns and --filter-columns options for eprime2tabfile now work.
+v0.8.1. Remove --filter-columns option from eprime2tabfile
 
-v0.6.9.1 Bug fix: Fix for parsing eprime log files in which leaf frames don't occur at the highest log level
+v0.8.0. Compatibility Warning: Lots of stuff has changed with the way column definition strings are computed. Test your existing scripts after updating! Architecture changes: Completely rewrote parser. String-based expressions now deprecate lambdas, though they'll continue to work in the future. This change fixes lots of odd bugs in defining computed columns and filters. Bug fixes: The --columns and --filter-columns options for eprime2tabfile now work.
+
+v0.6.9.1. Bug fix: Fix for parsing eprime log files in which leaf frames don't occur at the highest log level
 
 v0.6.9. New features: Supports parsing raw tab-delmimted files; Allows Procs as starting values for ComputedColumns. Bug fixes: No longer jumbles the order of Eprime log files
 
