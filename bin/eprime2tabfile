@@ -78,7 +78,7 @@ module Optimus
     def option_parser(option_hash, args)
       opts = OptionParser.new
 
-      opts.banner = "Usage: optimuslog2tabfile [options] INPUT_FILES"
+      opts.banner = "Usage: eprime2tabfile [options] INPUT_FILES"
       opts.separator ""
 
       opts.on('-o', '--outfile=OUTFILE', String,
