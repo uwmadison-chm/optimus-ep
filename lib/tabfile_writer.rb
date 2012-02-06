@@ -35,18 +35,17 @@ module Optimus
     
     # Write to the output stream.
     def write
-      CSV::Writer.generate(@outstream, "\t") do |tsv|
-        if @write_top_line
-          name = @outstream.respond_to?(:path) ? File.expand_path(@outstream.path.to_s) : ''
-          tsv << [name]
-        end
-        if @column_labels
-          tsv << @columns
-        end
-        @optimus.each do |row|
-          vals = @columns.map { |col_name| row[col_name] }
-          tsv << vals
-        end
+      tsv = CSV.new(@outstream, {:col_sep => "\t"})
+      if @write_top_line
+        name = @outstream.respond_to?(:path) ? File.expand_path(@outstream.path.to_s) : ''
+        tsv << [name]
+      end
+      if @column_labels
+        tsv << @columns
+      end
+      @optimus.each do |row|
+        vals = @columns.map { |col_name| row[col_name] }
+        tsv << vals
       end
     end
   end
