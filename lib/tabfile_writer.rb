@@ -35,7 +35,12 @@ module Optimus
     
     # Write to the output stream.
     def write
-      tsv = CSV.new(@outstream, {:col_sep => "\t"})
+      tsv = nil
+      begin
+        tsv = CSV::Writer.create(@outstream, col_sep="\t")
+      rescue
+        tsv = CSV.new(@outstream, {:col_sep => "\t"})
+      end
       if @write_top_line
         name = @outstream.respond_to?(:path) ? File.expand_path(@outstream.path.to_s) : ''
         tsv << [name]
