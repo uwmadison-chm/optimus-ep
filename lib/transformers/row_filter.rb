@@ -9,8 +9,6 @@ module Optimus
   module Transformers
   
     # Implements a row-wise filter for optimus data.
-    # Right now it requires a proc; I'll do something better with a little
-    # DSL later.
     class RowFilter
       include Enumerable
     
@@ -22,6 +20,10 @@ module Optimus
     
       def to_optimus_data
         computed
+      end
+      
+      def each
+        computed.each {|row| yield row }
       end
       
       def method_missing(method, *args, &block)
