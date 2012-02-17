@@ -23,8 +23,11 @@ module Optimus
   # Raised whenever an input file seems to be damaged
   class DamagedFileError < Error; end
   
+  class ParseError < Error; end
+  
   # Raised when a parse fails due to loops
-  class EvaluationLoopError < Error; end
+  class EvaluationLoopError < ParseError; end
   
   class DuplicateColumnError < Error; end
+  
 end
