@@ -47,7 +47,7 @@ module Optimus
         @sort_expression = Evaluatable.new(value, @parser)
       end
       
-      def computed_column(name, start_val, options = {})
+      def computed_column(name, start_val, options={})
         if columns.include?(name)
           raise DuplicateColumnError.new("Can't add duplicate column name #{name}")
         end
@@ -55,11 +55,13 @@ module Optimus
         @computed_column_names << name
         new_opts = DEFAULT_COL_OPTS.merge(options)
         DEFAULT_COL_OPTS.keys.each do |key|
-          new_opts[key] = Evaluatable.new(new_opts[key], @parser)
+          begin
+            new_opts[key] = Evaluatable.new(new_opts[key], @parser)
+          rescue Exception => e
+            raise ParseError.new("Did not understand #{name}: #{e}")
+          end
         end
-        @computed_columns[name] = ComputedColumn.new(
-          name, sve, new_opts
-        )
+        @computed_columns[name] = ComputedColumn.new(name, sve, new_opts)
         reset!
       end
       
@@ -67,8 +69,11 @@ module Optimus
         computed_column(new_name, "{#{old_name}}", :reset_when => "{#{old_name}}")
       end
       
-      def counter_column(name, start_val = 1, options = {})
-        computed_column(name, start_val, options = {})
+      def counter_column(name, options = {})
+        start_val = options[:start_val] || 1
+        options[:reset_when] ||= :once
+        options[:count_when] ||= true
+        computed_column(name, start_val, options)
       end
       
       def columns
@@ -127,11 +132,13 @@ module Optimus
         end
         
         def evaluate(*args)
-          if @reset_when.bool_eval(*args)
+          should_reset = @reset_when.bool_eval(*args)
+          if should_reset
             @current_value = @reset_exp.evaluate(*args)
           end
-          next_val! if @count_when.bool_eval(*args)
-          return @current_value
+          should_count = @count_when.bool_eval(*args)
+          next_val! if should_count
+          @current_value
         end
         
         private
@@ -154,6 +161,10 @@ module Optimus
           else
             @target = target
           end
+        end
+        
+        def to_s
+          "Evaluatable (#{@target})"
         end
         
         def evaluate(*args)

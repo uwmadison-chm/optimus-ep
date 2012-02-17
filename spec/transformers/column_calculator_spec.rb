@@ -40,6 +40,11 @@ describe Optimus::Transformers::ColumnCalculator do
     @pc.columns.should include(NEW_COLUMN)
   end
   
+  it "should allow empty columns" do
+    @pc.computed_column NEW_COLUMN, ""
+    @pc.columns.should include(NEW_COLUMN)
+  end
+  
   it "should raise an error when adding bad columns" do
     lambda {
       @pc.computed_column NEW_COLUMN, "FIAL"
@@ -59,7 +64,9 @@ describe Optimus::Transformers::ColumnCalculator do
   end
   
   it "should return values for columns based on lambdas" do
-    @pc.computed_column NEW_COLUMN, lambda {|row| row['stim_time'] }
+    @pc.computed_column NEW_COLUMN, lambda {|row| 
+      row['stim_time'] 
+    }
     @pc.computed_column "NEW_COL2", lambda {|row| 1}
     @pc.each do |row|
       row[NEW_COLUMN].should == row['stim_time']
@@ -131,7 +138,7 @@ describe Optimus::Transformers::ColumnCalculator do
     it "should never update when false condition" do
       @pc.computed_column NEW_COLUMN, "{stim_time}", :reset_when => "''"
       @pc.each do |row|
-        row[NEW_COLUMN].should be_nil
+        row[NEW_COLUMN].to_s.should == ''
       end
     end
     
