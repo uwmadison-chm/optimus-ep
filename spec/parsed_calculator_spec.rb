@@ -16,6 +16,10 @@ describe Optimus::ParsedCalculator::ExpressionParser do
     @exp = Optimus::ParsedCalculator::ExpressionParser.new
   end
   
+  it "should allow empty expressions" do
+    @exp.should round_trip("")
+  end
+  
   it "should parse positive integers" do
     @exp.should round_trip("1")
   end

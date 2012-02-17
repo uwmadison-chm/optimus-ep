@@ -62,11 +62,10 @@ module Optimus
       end
       
       def parse(str)
-        begin
-          @parser.parse(str)
-        rescue Exception
-          raise
+        if str.strip.empty?
+          return ''
         end
+        @parser.parse(str)
       end
       
       private
