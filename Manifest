@@ -3,6 +3,7 @@ GPL.txt
 LICENSE
 Manifest
 README
+README.textile
 Rakefile
 autotest/discover.rb
 bin/eprime2tabfile
