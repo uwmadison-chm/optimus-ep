@@ -6,7 +6,6 @@
 # Imaging and Behavior, University of Wisconsin - Madison
 
 require 'stringio'
-require 'iconv'
 
 require 'log_file_parser'
 require 'excel_parser'
@@ -58,11 +57,21 @@ module Optimus
     end
     
     def set_file_with_encoding(file)
+      converted_f = nil
       file.rewind
       datas = file.read(2)
       if datas == "\377\376"
-        converted = Iconv.conv("ASCII//TRANSLIT", "UTF-16LE", file.read)
-        converted_f = StringIO.new(converted)
+        file_data = file.read
+        if file_data.respond_to? :encode
+          # Ruby 1.9.x -- iconv is deprecated here
+          converted_f = StringIO.new(
+            file_data.encode("UTF-8", "UTF-16LE"))
+        else
+          # Ruby 1.8.x -- no String#encode()
+          require 'iconv'
+          converted_f = StringIO.new(
+            Iconv.conv("UTF-8", "UTF-16LE", file_data))
+        end
       else
         converted_f = file
         converted_f.rewind
