@@ -70,7 +70,7 @@ module Optimus
       end
       
       def counter_column(name, options = {})
-        start_val = options[:start_val] || 1
+        start_val = options[:start_value] || 1
         options[:reset_when] ||= :once
         options[:count_when] ||= true
         computed_column(name, start_val, options)
