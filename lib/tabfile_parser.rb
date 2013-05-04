@@ -24,6 +24,7 @@ module Optimus
         @file = file
         @skip_lines = options[:skip_lines] || 0
         @columns = options[:columns]
+        @merge_header_lines = options[:merge_header_lines] || 1
       end
       
       def to_optimus
@@ -32,7 +33,12 @@ module Optimus
           lines.shift
         end
         
-        file_columns = lines.shift.split("\t").map {|elt| elt.strip }
+        headers = []
+        @merge_header_lines.times do
+          headers << lines.shift.split("\t").map {|elt| elt.strip }
+        end
+        file_columns = headers[0].zip(*headers[1..-1]).map{|labels| labels.join(' ')}
+
         expected_size = file_columns.size
         columns = file_columns
         data = Optimus::Data.new(columns)
