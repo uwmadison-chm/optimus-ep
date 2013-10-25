@@ -30,7 +30,6 @@ module Optimus
       #               (and their order)
       #   :force => true, if you want to ignore things such as column added
       #               warnings and if the file is incomplete
-      
       def initialize(file, options = {})
         @columns = options[:columns]
         @force = options[:force]
@@ -57,11 +56,12 @@ module Optimus
     
         @columns ||= @found_cols.names
         data = Optimus::Data.new(@columns)
-        self.leaf_frames.each do |frame|
+        self.leaf_frames.each_with_index do |frame, i|
           row = data.add_row
           @found_cols.names_with_cols.each do |pair|
             name, col = *pair
             val = frame.get(col)
+            $stderr.puts("Frame #{i}: setting #{name} to #{val}")
             row[name] = val
           end
         end
@@ -154,7 +154,7 @@ module Optimus
           counts[frame.level] += 1
           key = @levels[frame.level]
           @found_cols.store(Column.new(key, frame.level))
-          frame[key] = counts[frame.level]
+          frame[key] ||= counts[frame.level]
           counts.fill(0, (frame.level+1)..@levels.length)
         end
       end
@@ -175,6 +175,7 @@ module Optimus
         attr_accessor :level
         attr_accessor :parent
         attr_accessor :children
+
         def initialize(parser)
           @level = nil
           @parent = nil
@@ -204,6 +205,7 @@ module Optimus
         end
         
         def []=(key, val)
+          $stderr.puts("Setting #{key} to #{val}")
           @data[Column.new(key, @level).to_s] = val
         end
         
