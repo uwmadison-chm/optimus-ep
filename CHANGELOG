@@ -1,3 +1,5 @@
+v 0.10.3. Oh god oh god I left logging information in now it is gone again.
+
 v 0.10.2. Generated counter columns no longer clobber columns with data you want. "Session" is the most common example.
 
 v.0.10.0. Actually make things like counter columns work again. Sorry, anyone who downloaded 0.9.x.

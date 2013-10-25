@@ -61,7 +61,6 @@ module Optimus
           @found_cols.names_with_cols.each do |pair|
             name, col = *pair
             val = frame.get(col)
-            $stderr.puts("Frame #{i}: setting #{name} to #{val}")
             row[name] = val
           end
         end
@@ -205,7 +204,6 @@ module Optimus
         end
         
         def []=(key, val)
-          $stderr.puts("Setting #{key} to #{val}")
           @data[Column.new(key, @level).to_s] = val
         end
         
