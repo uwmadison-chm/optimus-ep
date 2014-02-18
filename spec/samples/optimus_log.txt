@@ -83,7 +83,6 @@ Display.RefreshRate: 60.000
 	RFP.LastPulseTime: 305000
 	BlockElapsed: 300000
 	CarriedVal: BlockLevel
-	Block: 0
 	*** LogFrame End ***
 Level: 1
 *** LogFrame Start ***
