@@ -28,14 +28,21 @@ module Optimus
       end
       
       def to_optimus
-        lines = @file.readlines
+        lines = @file.read
+        lines.gsub!(/\r\n?/,"\n")
+        lines = lines.split("\n")
+        
+        raise DamagedFileError.new("File #{@file.path} appears to be empty.") if lines.nil?
+        
         @skip_lines.times do
           lines.shift
         end
         
         headers = []
+
         @merge_header_lines.times do
-          headers << lines.shift.split("\t").map {|elt| elt.strip }
+          l = lines.shift
+          headers << l.split("\t",-1).map {|elt| elt.strip }
         end
         file_columns = headers[0].zip(*headers[1..-1]).map{|labels| labels.join(' ')}
 
@@ -46,7 +53,7 @@ module Optimus
         lines.each do |line|
           current_line += 1
           row = data.add_row
-          col_data = line.split("\t").map {|e| e.strip }
+          col_data = line.split("\t",-1).map {|e| e.strip }
           if col_data.size != expected_size
             raise DamagedFileError.new("In #{@file.path}, line #{current_line} should have #{expected_size} columns but had #{col_data.size}.")
           end
