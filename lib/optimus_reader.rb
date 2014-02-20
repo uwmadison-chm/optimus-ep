@@ -91,6 +91,9 @@ module Optimus
       2.times do
         first_lines << @file.gets
       end
+      unless first_lines[1]
+        first_lines = first_lines[0].gsub(/\r\n?/, '\n').split('\n')[0..1]
+      end
       @file.pos = original_pos
       @type = determine_file_type(first_lines)
       if @type.nil?
