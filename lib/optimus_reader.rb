@@ -60,18 +60,19 @@ module Optimus
       converted_f = nil
       file.rewind
       datas = file.read(2)
-      if datas == "\377\376"
+      if datas.respond_to? :encode and
+          datas == "\xff\xfe".force_encoding("ASCII-8BIT")
+        # Ruby 1.9.x -- iconv is deprecated here
         file_data = file.read
-        if file_data.respond_to? :encode
-          # Ruby 1.9.x -- iconv is deprecated here
-          converted_f = StringIO.new(
-            file_data.encode("UTF-8", "UTF-16LE"))
-        else
-          # Ruby 1.8.x -- no String#encode()
-          require 'iconv'
-          converted_f = StringIO.new(
-            Iconv.conv("UTF-8", "UTF-16LE", file_data))
-        end
+        converted_f = StringIO.new(
+          file_data.encode("UTF-8", "UTF-16LE"))
+      elsif not datas.respond_to? :encode and
+          datas == "\xff\xfe"
+        # Ruby 1.8.x -- no String#encode()
+        file_data = file.read
+        require 'iconv'
+        converted_f = StringIO.new(
+          Iconv.conv("UTF-8", "UTF-16LE", file_data))
       else
         converted_f = file
         converted_f.rewind
