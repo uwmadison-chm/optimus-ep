@@ -1,3 +1,5 @@
+v 0.10.4. Fix for unicode handling under Ruby 2.x.
+
 v 0.10.3. Oh god oh god I left logging information in now it is gone again.
 
 v 0.10.2. Generated counter columns no longer clobber columns with data you want. "Session" is the most common example.
